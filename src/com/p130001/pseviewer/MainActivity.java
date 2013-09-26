@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -26,26 +27,37 @@ public class MainActivity extends Activity {
 
 	private String mName, mCode, mPrice, mPercentChange, mVolume, mAsOf;
 	private ListAdapter mAdapter;
+	private TextView mAsOfTextView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
+		setupList();
+		initialize();
+	}
+
+	private void setupList() {
 
 		if (isNetworkConnected()) {
-			reloadList();
+			ArrayList<HashMap<String, String>> stockList = null;
+			stockList = getStockList();
+			
+			mAdapter = new SimpleAdapter(this, stockList, R.layout.row_item,
+					new String[] { "name", "code", "percentChange", "price",
+							"volume" }, new int[] { R.id.tvName, R.id.tvCode,
+							R.id.tvPercentChange, R.id.tvPrice, R.id.tvVolume });
 		} else {
-			Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG)
+					.show();
 		}
-
-		initialize();
 
 	}
 
-	private void reloadList() {
-		ArrayList<HashMap<String, String>> contactList = new ArrayList<HashMap<String, String>>();
-		String jString = JSONParser.getJSONFromUrl(Util.API_PSE_ALL);
+	private ArrayList<HashMap<String, String>> getStockList() {
+		ArrayList<HashMap<String, String>> stockList = new ArrayList<HashMap<String, String>>();
+		String jString = JSONParser.getJSONFromUrl(Util.API_PSE_TEL);
 
 		try {
 			JSONObject jObject = new JSONObject(jString);
@@ -75,17 +87,22 @@ public class MainActivity extends Activity {
 				map.put("percentChange", mPercentChange);
 				map.put("price", mPrice);
 				map.put("volume", mVolume);
-				contactList.add(map);
+				stockList.add(map);
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return stockList;
 
-		mAdapter = new SimpleAdapter(this, contactList, R.layout.row_item,
-				new String[] { "name", "code", "percentChange", "price",
-						"volume" }, new int[] { R.id.tvName, R.id.tvCode,
-						R.id.tvPercentChange, R.id.tvPrice, R.id.tvVolume });
+	}
+
+	private void initialize() {
+		mAsOfTextView = (TextView) findViewById(R.id.tvAsOf);
+		mAsOfTextView.setText(mAsOf);
+
+		final ListView listview = (ListView) findViewById(R.id.listView);
+		listview.setAdapter(mAdapter);
 	}
 
 	private boolean isNetworkConnected() {
@@ -96,18 +113,30 @@ public class MainActivity extends Activity {
 		return activeNetworkInfo != null;
 	}
 
-	private void initialize() {
-		TextView asOf = (TextView) findViewById(R.id.tvAsOf);
-		asOf.setText(mAsOf);
-
-		final ListView listview = (ListView) findViewById(R.id.listView);
-		listview.setAdapter(mAdapter);
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_reload:
+			Toast.makeText(getApplicationContext(), "Reloading",
+					Toast.LENGTH_LONG).show();
+			reloadStockList();
+			return true;
+
+		default:
+			return super.onOptionsItemSelected(item);
+
+		}
+	}
+
+	private void reloadStockList() {
+		setupList();
+		initialize();
 	}
 }
