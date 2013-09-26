@@ -10,13 +10,17 @@ import com.p130001.pseviewer.JSONParser;
 import com.p130001.pseviewer.R;
 import com.p130001.pseviewer.Util;
 
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Context;
 import android.view.Menu;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -29,6 +33,17 @@ public class MainActivity extends Activity {
 
 		setContentView(R.layout.activity_main);
 
+		if (isNetworkConnected()) {
+			reloadList();
+		} else {
+			Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG).show();
+		}
+
+		initialize();
+
+	}
+
+	private void reloadList() {
 		ArrayList<HashMap<String, String>> contactList = new ArrayList<HashMap<String, String>>();
 		String jString = JSONParser.getJSONFromUrl(Util.API_PSE_ALL);
 
@@ -71,9 +86,14 @@ public class MainActivity extends Activity {
 				new String[] { "name", "code", "percentChange", "price",
 						"volume" }, new int[] { R.id.tvName, R.id.tvCode,
 						R.id.tvPercentChange, R.id.tvPrice, R.id.tvVolume });
+	}
 
-		initialize();
+	private boolean isNetworkConnected() {
+		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo activeNetworkInfo = connectivityManager
+				.getActiveNetworkInfo();
 
+		return activeNetworkInfo != null;
 	}
 
 	private void initialize() {
