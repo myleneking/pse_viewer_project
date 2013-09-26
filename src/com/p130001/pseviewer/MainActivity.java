@@ -12,8 +12,10 @@ import com.p130001.pseviewer.Util;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +30,7 @@ public class MainActivity extends Activity {
 	private String mName, mCode, mPrice, mPercentChange, mVolume, mAsOf;
 	private ListAdapter mAdapter;
 	private TextView mAsOfTextView;
+	ArrayList<HashMap<String, String>> stockList = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,29 +38,19 @@ public class MainActivity extends Activity {
 
 		setContentView(R.layout.activity_main);
 		setupList();
-		initialize();
 	}
 
 	private void setupList() {
-
 		if (isNetworkConnected()) {
-			ArrayList<HashMap<String, String>> stockList = null;
-			stockList = getStockList();
-			
-			mAdapter = new SimpleAdapter(this, stockList, R.layout.row_item,
-					new String[] { "name", "code", "percentChange", "price",
-							"volume" }, new int[] { R.id.tvName, R.id.tvCode,
-							R.id.tvPercentChange, R.id.tvPrice, R.id.tvVolume });
+			new loadStockList().execute();
 		} else {
-			Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG).show();
 		}
-
 	}
 
 	private ArrayList<HashMap<String, String>> getStockList() {
 		ArrayList<HashMap<String, String>> stockList = new ArrayList<HashMap<String, String>>();
-		String jString = JSONParser.getJSONFromUrl(Util.API_PSE_TEL);
+		String jString = JSONParser.getJSONFromUrl(Util.API_PSE_ALL);
 
 		try {
 			JSONObject jObject = new JSONObject(jString);
@@ -97,14 +90,6 @@ public class MainActivity extends Activity {
 
 	}
 
-	private void initialize() {
-		mAsOfTextView = (TextView) findViewById(R.id.tvAsOf);
-		mAsOfTextView.setText(mAsOf);
-
-		final ListView listview = (ListView) findViewById(R.id.listView);
-		listview.setAdapter(mAdapter);
-	}
-
 	private boolean isNetworkConnected() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetworkInfo = connectivityManager
@@ -124,9 +109,7 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_reload:
-			Toast.makeText(getApplicationContext(), "Reloading",
-					Toast.LENGTH_LONG).show();
-			reloadStockList();
+			setupList();
 			return true;
 
 		default:
@@ -135,8 +118,41 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private void reloadStockList() {
-		setupList();
-		initialize();
+	public class loadStockList extends AsyncTask<String, Integer, String>{
+
+		ProgressDialog dialog;
+		
+		@Override
+		protected void onPreExecute() {
+			dialog = ProgressDialog.show(MainActivity.this, "Fetching Data", "Please wait...", true, false);
+		}
+		
+		@Override
+		protected String doInBackground(String... params) {
+			stockList = getStockList();
+			return null;
+		}
+		
+		@Override
+		protected void onProgressUpdate(Integer... values) {
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {
+			mAsOfTextView = (TextView) findViewById(R.id.tvAsOf);
+			mAsOfTextView.setText(mAsOf);
+
+			final ListView listview = (ListView) findViewById(R.id.listView);
+			mAdapter = new SimpleAdapter(
+					MainActivity.this, 
+					stockList, 
+					R.layout.row_item,
+					new String[] { "name", "code", "percentChange", "price", "volume" }, 
+					new int[] { R.id.tvName, R.id.tvCode, R.id.tvPercentChange, R.id.tvPrice, R.id.tvVolume }
+			);
+			listview.setAdapter(mAdapter);
+			
+			dialog.dismiss();
+		}
 	}
 }
