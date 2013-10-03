@@ -9,6 +9,8 @@ import org.json.JSONObject;
 import com.p130001.pseviewer.JSONParser;
 import com.p130001.pseviewer.R;
 import com.p130001.pseviewer.Util;
+import com.p130001.pseviewer.adapter.StockAdapter;
+import com.p130001.pseviewer.list.StockList;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -19,18 +21,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
 	private String mName, mCode, mPrice, mPercentChange, mVolume, mAsOf;
-	private ListAdapter mAdapter;
 	private TextView mAsOfTextView;
 	ArrayList<HashMap<String, String>> stockList = null;
+	private ArrayList<StockList> mItems;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +51,7 @@ public class MainActivity extends Activity {
 	private ArrayList<HashMap<String, String>> getStockList() {
 		ArrayList<HashMap<String, String>> stockList = new ArrayList<HashMap<String, String>>();
 		String jString = JSONParser.getJSONFromUrl(Util.API_PSE_ALL);
+		mItems = new ArrayList<StockList>();
 
 		try {
 			JSONObject jObject = new JSONObject(jString);
@@ -64,23 +65,17 @@ public class MainActivity extends Activity {
 
 			for (int i = 0; i < stockArr.length(); i++) {
 				JSONObject stock = stockArr.getJSONObject(i);
-				mName = stock.getString("name");
-				mCode = stock.getString("symbol");
-				mPercentChange = stock.getString("percent_change");
-				mVolume = stock.getString("volume");
+				mName = stock.getString(Tag.NAME);
+				mCode = stock.getString(Tag.SYMBOL);
+				mPercentChange = stock.getString(Tag.PERCENT_CHANGE);
+				mVolume = stock.getString(Tag.VOLUME);
 
 				JSONObject price = stock.getJSONObject("price");
 				String currency = price.getString("currency");
 				String amount = price.getString("amount");
 				mPrice = currency + " " + amount;
 
-				HashMap<String, String> map = new HashMap<String, String>();
-				map.put("name", mName);
-				map.put("code", mCode);
-				map.put("percentChange", mPercentChange);
-				map.put("price", mPrice);
-				map.put("volume", mVolume);
-				stockList.add(map);
+				mItems.add(new StockList(mName, mCode, mPercentChange, mPrice, mVolume));
 			}
 
 		} catch (Exception e) {
@@ -143,14 +138,7 @@ public class MainActivity extends Activity {
 			mAsOfTextView.setText(mAsOf);
 
 			final ListView listview = (ListView) findViewById(R.id.listView);
-			mAdapter = new SimpleAdapter(
-					MainActivity.this, 
-					stockList, 
-					R.layout.row_item,
-					new String[] { "name", "code", "percentChange", "price", "volume" }, 
-					new int[] { R.id.tvName, R.id.tvCode, R.id.tvPercentChange, R.id.tvPrice, R.id.tvVolume }
-			);
-			listview.setAdapter(mAdapter);
+			listview.setAdapter(new StockAdapter(MainActivity.this, mItems));
 			
 			dialog.dismiss();
 		}

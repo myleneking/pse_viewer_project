@@ -20,8 +20,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Name: "
-                android:textColor="@android:color/darker_gray" />
+                android:text="Name: " />
 
             <TextView
                 android:id="@+id/tvName"
@@ -37,8 +36,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Code: "
-                android:textColor="@android:color/darker_gray" />
+                android:text="Code: " />
 
             <TextView
                 android:id="@+id/tvCode"
@@ -54,8 +52,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Price: "
-                android:textColor="@android:color/darker_gray" />
+                android:text="Price: " />
 
             <TextView
                 android:id="@+id/tvPrice"
@@ -71,8 +68,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Percent Change :"
-                android:textColor="@android:color/darker_gray" />
+                android:text="Percent Change :" />
 
             <TextView
                 android:id="@+id/tvPercentChange"
@@ -88,8 +84,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Volume: "
-                android:textColor="@android:color/darker_gray" />
+                android:text="Volume: " />
 
             <TextView
                 android:id="@+id/tvVolume"
@@ -97,5 +92,12 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivArrow"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/img_arrow_down" />
 
 </RelativeLayout>
