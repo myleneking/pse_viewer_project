@@ -8,7 +8,9 @@ public class Util {
 	public final static String API_PSE_COL = "http://phisix-api.appspot.com/stocks/COL.json";
 	public final static String API_PSE_TEL = "http://phisix-api.appspot.com/stocks/TEL.json";
 	
-	public final static String GAINER = "green";
-	public final static String LOSER = "red";
+	public final static String RELOAD = "reload";
+	public final static String ALL = "all";
+	public final static String GAINER = "gain";
+	public final static String LOSER = "lose";
 
 }
