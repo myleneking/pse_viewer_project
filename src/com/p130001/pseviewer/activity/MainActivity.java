@@ -1,8 +1,6 @@
 package com.p130001.pseviewer.activity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -19,10 +17,13 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,7 +32,6 @@ public class MainActivity extends Activity {
 
 	private String mJStringNew, mName, mCode, mPrice, mPercentChange, mVolume, mDate;
 	private TextView mAsOfTextView;
-	ArrayList<HashMap<String, String>> stockList = null;
 	private ArrayList<StockList> mItems;
 
 	@Override
@@ -39,27 +39,11 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
-		setupList(Util.RELOAD);
-	}
-
-	private void setupList(String mode) {
 		if (isNetworkConnected()) {
-			if (mode.equals(Util.RELOAD)) {
-				new LoadStockList().execute();
-			} else if (mode.equals(Util.GAINER)) {
-				new LoadStockFromDatabase(Util.GAINER).execute();
-			} else if (mode.equals(Util.LOSER)){
-				new LoadStockFromDatabase(Util.LOSER).execute();
-			}
+			new LoadStockList().execute();
 		} else {
-			if (mode.equals(Util.RELOAD)) {
-				new LoadStockFromDatabase(Util.ALL).execute();
-			} else if (mode.equals(Util.GAINER)) {
-				new LoadStockFromDatabase(Util.GAINER).execute();
-			} else if (mode.equals(Util.LOSER)){
-				new LoadStockFromDatabase(Util.LOSER).execute();
-			}
 			Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
+			new LoadStockFromDatabase(Util.ALL).execute();
 		}
 	}
 
@@ -82,21 +66,56 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_reload:
-			setupList(Util.RELOAD);
+			if (isNetworkConnected()) {
+				new LoadStockList().execute();
+			} else {
+				Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
+				new LoadStockFromDatabase(Util.ALL).execute();
+			}
 			return true;
 		
 		case R.id.action_gainers:
-			setupList(Util.GAINER);
+			new LoadStockFromDatabase(Util.GAINER).execute();
 			return true;
 		
 		case R.id.action_losers:
-			setupList(Util.LOSER);
+			new LoadStockFromDatabase(Util.LOSER).execute();
+			return true;
+		
+		case R.id.action_search:
+			openSearchInputDialog();
 			return true;
 			
 		default:
 			return super.onOptionsItemSelected(item);
 
 		}
+	}
+
+	private void openSearchInputDialog() {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+		alert.setTitle("Search Code");
+
+		// Set an EditText view to get user input 
+		final EditText input = new EditText(this);
+		alert.setView(input);
+
+		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String code = input.getText().toString().toUpperCase();
+				new LoadStockFromDatabase(Util.SEARCH, code).execute();
+				//Toast.makeText(MainActivity.this, code, Toast.LENGTH_SHORT).show();
+			}
+		});
+
+		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// Canceled.
+			}
+		});
+
+		alert.show();
 	}
 
 	public class LoadStockList extends AsyncTask<String, Integer, String>{
@@ -171,13 +190,19 @@ public class MainActivity extends Activity {
 		}
 	}
 	
-	public class LoadStockFromDatabase extends AsyncTask<String, Integer, String> {
+	public class LoadStockFromDatabase extends AsyncTask<String, Integer, ArrayList<StockList>> {
 
 		ProgressDialog mDialog;
 		String mMode;
+		String mInputCode;
 		
 		public LoadStockFromDatabase(String mode) {
 			this.mMode = mode;
+		}
+		
+		public LoadStockFromDatabase(String mode, String code) {
+			this.mMode = mode;
+			this.mInputCode = code;
 		}
 		
 		public LoadStockFromDatabase() {
@@ -185,33 +210,49 @@ public class MainActivity extends Activity {
 		
 		@Override
 		protected void onPreExecute() {
-			mDialog = ProgressDialog.show(MainActivity.this, "Loading Database Data", "Please wait...", true, false);
+			String message;
+			if (mMode.equals(Util.SEARCH)) {
+				message = "Searching Code";
+			} else {
+				message = "Loading Database Data";
+			}
+			mDialog = ProgressDialog.show(MainActivity.this, message, "Please wait...", true, false);
 		};
 		
 		@Override
-		protected String doInBackground(String... params) {
+		protected ArrayList<StockList> doInBackground(String... params) {
 			
 			StockDataSource datasource = new StockDataSource(MainActivity.this);
+			ArrayList<StockList> result = null;
+
 			datasource.open();
 			
 			if (mMode.equals(Util.GAINER)) {
-				mItems = datasource.getGainers();
+				result = datasource.getGainers();
 			} else if (mMode.equals(Util.LOSER)) {
-				mItems = datasource.getLosers();
+				result = datasource.getLosers();
+			} else if (mMode.equals(Util.SEARCH)){
+				result = datasource.getByCode(mInputCode);
 			} else {
-				mItems = datasource.getAll();
+				result = datasource.getAll();
 			} 
 			
-			if (mItems != null) {
-				mDate = mItems.get(0).getDate();
+			if (result.size() != 0) {
+				mDate = result.get(0).getDate();
 			}
 			datasource.close();
 			
-			return null;
+			return result;
 		}
 		
 		@Override
-		protected void onPostExecute(String result) {
+		protected void onPostExecute(ArrayList<StockList> result) {
+			if (result.size() != 0) {
+				mItems = result;
+			} else {
+				Toast.makeText(MainActivity.this, "Code not found!", Toast.LENGTH_SHORT).show();
+			}
+			
 			mAsOfTextView = (TextView) findViewById(R.id.tvAsOf);
 			mAsOfTextView.setText(mDate);
 

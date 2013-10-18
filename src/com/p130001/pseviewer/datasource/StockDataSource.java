@@ -20,8 +20,8 @@ public class StockDataSource {
 			MySQLiteHelper.COLUMN_NAME,
 			MySQLiteHelper.COLUMN_SYMBOL,
 			MySQLiteHelper.COLUMN_PERCENT_CHANGE,
-			MySQLiteHelper.COLUMN_VOLUME,
 			MySQLiteHelper.COLUMN_PRICE,
+			MySQLiteHelper.COLUMN_VOLUME,
 			MySQLiteHelper.COLUMN_AS_OF
 	};
 	
@@ -107,7 +107,22 @@ public class StockDataSource {
 		
 		return losers;
 	}
-	
+
+	public ArrayList<StockList> getByCode(String code) {
+		ArrayList<StockList> search = new ArrayList<StockList>();
+		String selectQuery = MySQLiteHelper.COLUMN_SYMBOL + "= '" + code + "'";
+		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , selectQuery , null, null, null, null);
+		cursor.moveToFirst();
+		while (!cursor.isAfterLast()) {
+			StockList stock = cursorToStock(cursor);
+			search.add(stock);
+			cursor.moveToNext();
+		}
+		cursor.close();
+		
+		return search;
+	}
+
 	private StockList cursorToStock(Cursor cursor) {
 		StockList stock = new StockList();
 		stock.setId(cursor.getLong(0));

@@ -12,5 +12,6 @@ public class Util {
 	public final static String ALL = "all";
 	public final static String GAINER = "gain";
 	public final static String LOSER = "lose";
+	public final static String SEARCH = "search";
 
 }
