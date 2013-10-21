@@ -3,6 +3,7 @@ package com.p130001.pseviewer.adapter;
 import java.util.ArrayList;
 
 import com.p130001.pseviewer.R;
+import com.p130001.pseviewer.datasource.StockDataSource;
 import com.p130001.pseviewer.list.StockList;
 
 import android.content.Context;
@@ -10,8 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 public class StockAdapter extends BaseAdapter{
 	private Context mContext;
@@ -35,7 +39,7 @@ public class StockAdapter extends BaseAdapter{
 		return 0;
 	}
 
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 
 		LayoutInflater inflater = (LayoutInflater) mContext
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -48,8 +52,9 @@ public class StockAdapter extends BaseAdapter{
 		TextView tvPrice = (TextView) rowView.findViewById(R.id.tvPrice);
 		TextView tvVolume = (TextView) rowView.findViewById(R.id.tvVolume);
 		ImageView ivArrow = (ImageView) rowView.findViewById(R.id.ivArrow);
+		ToggleButton tbWatch = (ToggleButton) rowView.findViewById(R.id.tbWatchList);
 
-		StockList item = this.mItems.get(position);
+		final StockList item = this.mItems.get(position);
 		double percentChange = Double.parseDouble(item.getPercentChange());
 		int color, arrow;
 		
@@ -80,6 +85,26 @@ public class StockAdapter extends BaseAdapter{
 		tvVolume.setTextColor(mContext.getResources().getColor(color));
 		
 		ivArrow.setImageResource(arrow);
+		
+		tbWatch.setChecked(item.getWatchFlg());
+		tbWatch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				StockDataSource datasource = new StockDataSource(mContext);
+				datasource.open();
+				
+				if(isChecked) {
+					datasource.addToWatchList(item.getCode());
+					//Toast.makeText(mContext, "added: " + ret, Toast.LENGTH_SHORT).show();
+		        }
+		        else {
+		        	//Toast.makeText(mContext, "removed: " + item.getCode(), Toast.LENGTH_SHORT).show();
+		        	datasource.removeToWatchList(item.getCode());
+		        }
+				datasource.close();
+			}
+		});
 		
 		return rowView;
 	}

@@ -22,7 +22,8 @@ public class StockDataSource {
 			MySQLiteHelper.COLUMN_PERCENT_CHANGE,
 			MySQLiteHelper.COLUMN_PRICE,
 			MySQLiteHelper.COLUMN_VOLUME,
-			MySQLiteHelper.COLUMN_AS_OF
+			MySQLiteHelper.COLUMN_AS_OF,
+			MySQLiteHelper.COLUMN_WATCH_FLG
 	};
 	
 	public StockDataSource (Context context) {
@@ -42,7 +43,7 @@ public class StockDataSource {
 		mContext.deleteDatabase(MySQLiteHelper.DATABASE_NAME);
 	}
 	
-	public StockList addStock(StockList stock) {
+	public void addStock(StockList stock) {
 		ContentValues values = new ContentValues();
 		
 		values.put(MySQLiteHelper.COLUMN_NAME, stock.getName());
@@ -52,13 +53,35 @@ public class StockDataSource {
 		values.put(MySQLiteHelper.COLUMN_VOLUME, stock.getVolume());
 		values.put(MySQLiteHelper.COLUMN_AS_OF, stock.getDate());
 		
-		long insertId = database.insert(MySQLiteHelper.TABLE_STOCKS, null, values);
-		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null, null, null, null);
-		cursor.moveToFirst();
-		StockList newStock = cursorToStock(cursor);
-		cursor.close();
+		database.insert(MySQLiteHelper.TABLE_STOCKS, null, values);
+	}
+	
+	public void updateStock(StockList stock, String code) {
+		ContentValues values = new ContentValues();
 		
-		return newStock;
+		values.put(MySQLiteHelper.COLUMN_NAME, stock.getName());
+		values.put(MySQLiteHelper.COLUMN_SYMBOL, stock.getCode());
+		values.put(MySQLiteHelper.COLUMN_PERCENT_CHANGE, stock.getPercentChange());
+		values.put(MySQLiteHelper.COLUMN_PRICE, stock.getPrice());
+		values.put(MySQLiteHelper.COLUMN_VOLUME, stock.getVolume());
+		values.put(MySQLiteHelper.COLUMN_AS_OF, stock.getDate());
+		
+		String whereClause = MySQLiteHelper.COLUMN_ID + "='" + code + "'";
+		database.update(MySQLiteHelper.TABLE_STOCKS, values, whereClause, null);
+	}
+	
+	private StockList cursorToStock(Cursor cursor) {
+		StockList stock = new StockList();
+		stock.setId(cursor.getLong(0));
+		stock.setName(cursor.getString(1));
+		stock.setCode(cursor.getString(2));
+		stock.setPercentChange(cursor.getString(3));
+		stock.setPrice(cursor.getString(4));
+		stock.setVolume(cursor.getString(5));
+		stock.setDate(cursor.getString(6));
+		stock.setWatchFlg(cursor.getString(7));
+		
+		return stock;
 	}
 	
 	public ArrayList<StockList> getAll() {
@@ -123,17 +146,45 @@ public class StockDataSource {
 		return search;
 	}
 
-	private StockList cursorToStock(Cursor cursor) {
-		StockList stock = new StockList();
-		stock.setId(cursor.getLong(0));
-		stock.setName(cursor.getString(1));
-		stock.setCode(cursor.getString(2));
-		stock.setPercentChange(cursor.getString(3));
-		stock.setPrice(cursor.getString(4));
-		stock.setVolume(cursor.getString(5));
-		stock.setDate(cursor.getString(6));
+	public void addToWatchList(String code) {
+		ContentValues values = new ContentValues();
+		values.put(MySQLiteHelper.COLUMN_WATCH_FLG, "1");
 		
-		return stock;
+		String whereClause = MySQLiteHelper.COLUMN_SYMBOL + "='" + code + "'"; 
+		database.update(MySQLiteHelper.TABLE_STOCKS, values, whereClause, null);
+	}
+
+	public void removeToWatchList(String code) {
+		ContentValues values = new ContentValues();
+		values.put(MySQLiteHelper.COLUMN_WATCH_FLG, "0");
+		
+		String whereClause = MySQLiteHelper.COLUMN_SYMBOL + "='" + code + "'"; 
+		database.update(MySQLiteHelper.TABLE_STOCKS, values, whereClause, null);
+	}
+
+	public ArrayList<StockList> getWatchList() {
+		ArrayList<StockList> watchList = new ArrayList<StockList>();
+
+		String selectQuery = MySQLiteHelper.COLUMN_WATCH_FLG + "= 1";
+		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , selectQuery , null, null, null, null);
+		cursor.moveToFirst();
+		while (!cursor.isAfterLast()) {
+			StockList stock = cursorToStock(cursor);
+			watchList.add(stock);
+			cursor.moveToNext();
+		}
+		cursor.close();
+		
+		return watchList;
+	}
+
+	public String getDate() {
+		String selectQuery = MySQLiteHelper.COLUMN_ID + "= 1";
+		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, new String[] { MySQLiteHelper.COLUMN_AS_OF } , selectQuery , null, null, null, null);
+		cursor.moveToFirst();
+		String date = cursor.getString(0);
+		cursor.close();
+		return date;
 	}
 
 }

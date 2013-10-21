@@ -13,5 +13,6 @@ public class Util {
 	public final static String GAINER = "gain";
 	public final static String LOSER = "lose";
 	public final static String SEARCH = "search";
+	public final static String WATCHLIST = "watchlist";
 
 }

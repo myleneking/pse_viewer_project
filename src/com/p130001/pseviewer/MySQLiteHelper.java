@@ -17,6 +17,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_VOLUME = Tag.VOLUME;
 	public static final String COLUMN_PRICE = Tag.PRICE;
 	public static final String COLUMN_AS_OF = Tag.AS_OF;
+	public static final String COLUMN_WATCH_FLG = "watch_flg";
 	
 	private static final int DATABASE_VERSION = 1;
 	
@@ -29,7 +30,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_PERCENT_CHANGE + " text not null, "
 			+ COLUMN_VOLUME + " text not null, "
 			+ COLUMN_PRICE + " text not null, "
-			+ COLUMN_AS_OF + " text not null"
+			+ COLUMN_AS_OF + " text not null,"
+			+ COLUMN_WATCH_FLG + " text not null default 0"
 			+ ");";
 	
 	public MySQLiteHelper(Context context) {

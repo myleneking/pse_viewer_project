@@ -75,7 +75,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
-
+        
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -97,7 +97,17 @@
         android:id="@+id/ivArrow"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:src="@drawable/img_arrow_down" />
+
+    <ToggleButton
+        android:id="@+id/tbWatchList"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/tb_watchlist"
+        android:textOff=""
+        android:textOn="" />
 
 </RelativeLayout>

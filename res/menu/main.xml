@@ -24,5 +24,11 @@
         android:orderInCategory="4"
         android:showAsAction="never"
         android:title="Losers"/>
+    <item
+        android:id="@+id/action_watchlist"
+        android:icon="@drawable/img_watchlist_on"
+        android:orderInCategory="4"
+        android:showAsAction="never"
+        android:title="Watch List"/>
 
 </menu>

@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import com.p130001.pseviewer.JSONParser;
 import com.p130001.pseviewer.R;
+import com.p130001.pseviewer.StockPreference;
 import com.p130001.pseviewer.Tag;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.adapter.StockAdapter;
@@ -21,6 +22,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -32,18 +34,19 @@ public class MainActivity extends Activity {
 
 	private String mJStringNew, mName, mCode, mPrice, mPercentChange, mVolume, mDate;
 	private TextView mAsOfTextView;
-	private ArrayList<StockList> mItems;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
+		StockPreference.setupPrefs(this);
+			
 		if (isNetworkConnected()) {
-			new LoadStockList().execute();
+			new GetApiData().execute();
 		} else {
 			Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
-			new LoadStockFromDatabase(Util.ALL).execute();
+			if (StockPreference.loadDatabaseUpdateStatus()) new LoadStockFromDatabase(Util.ALL).execute();
 		}
 	}
 
@@ -67,7 +70,7 @@ public class MainActivity extends Activity {
 		switch (item.getItemId()) {
 		case R.id.action_reload:
 			if (isNetworkConnected()) {
-				new LoadStockList().execute();
+				new GetApiData().execute();
 			} else {
 				Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
 				new LoadStockFromDatabase(Util.ALL).execute();
@@ -84,6 +87,10 @@ public class MainActivity extends Activity {
 		
 		case R.id.action_search:
 			openSearchInputDialog();
+			return true;
+			
+		case R.id.action_watchlist:
+			new LoadStockFromDatabase(Util.WATCHLIST).execute();
 			return true;
 			
 		default:
@@ -105,7 +112,6 @@ public class MainActivity extends Activity {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String code = input.getText().toString().toUpperCase();
 				new LoadStockFromDatabase(Util.SEARCH, code).execute();
-				//Toast.makeText(MainActivity.this, code, Toast.LENGTH_SHORT).show();
 			}
 		});
 
@@ -118,7 +124,7 @@ public class MainActivity extends Activity {
 		alert.show();
 	}
 
-	public class LoadStockList extends AsyncTask<String, Integer, String>{
+	public class GetApiData extends AsyncTask<String, Integer, String>{
 
 		ProgressDialog mDialog;
 		
@@ -131,7 +137,6 @@ public class MainActivity extends Activity {
 		protected String doInBackground(String... params) {
 			StockDataSource datasource = new StockDataSource(MainActivity.this);
 			mJStringNew = JSONParser.getJSONFromUrl(Util.API_PSE_ALL);
-			mItems = new ArrayList<StockList>();
 
 			try {
 				JSONObject jObject = new JSONObject(mJStringNew);
@@ -141,8 +146,6 @@ public class MainActivity extends Activity {
 				String time = asOf.substring(11, 19);
 				mDate = date + " " + time;
 
-				datasource.dropDatabase();
-				
 				JSONArray stockArr = jObject.getJSONArray("stock");
 
 				for (int i = 0; i < stockArr.length(); i++) {
@@ -158,16 +161,20 @@ public class MainActivity extends Activity {
 					mPrice = currency + " " + amount;
 
 					StockList stockRow = new StockList(mName, mCode, mPercentChange, mPrice, mVolume, mDate);
-					mItems.add(stockRow);
 					
+					//Save to database
 					if (mName != null && mCode != null && mPercentChange != null && mPrice != null && mVolume != null && mDate != null) {
 						datasource.open();
-						datasource.addStock(stockRow);
+						if (StockPreference.loadDatabaseUpdateStatus()) {
+							datasource.updateStock(stockRow, mCode);
+						} else {
+							datasource.addStock(stockRow);
+						}
 						datasource.close();
 					}
-					
 				}
-
+				if (!StockPreference.loadDatabaseUpdateStatus()) StockPreference.saveDatabaseUpdateStatus(true);;
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -180,13 +187,8 @@ public class MainActivity extends Activity {
 		
 		@Override
 		protected void onPostExecute(String result) {
-			mAsOfTextView = (TextView) findViewById(R.id.tvAsOf);
-			mAsOfTextView.setText(mDate);
-
-			final ListView listview = (ListView) findViewById(R.id.listView);
-			listview.setAdapter(new StockAdapter(MainActivity.this, mItems));
-			
 			mDialog.dismiss();
+			new LoadStockFromDatabase(Util.ALL).execute();
 		}
 	}
 	
@@ -205,18 +207,9 @@ public class MainActivity extends Activity {
 			this.mInputCode = code;
 		}
 		
-		public LoadStockFromDatabase() {
-		}
-		
 		@Override
 		protected void onPreExecute() {
-			String message;
-			if (mMode.equals(Util.SEARCH)) {
-				message = "Searching Code";
-			} else {
-				message = "Loading Database Data";
-			}
-			mDialog = ProgressDialog.show(MainActivity.this, message, "Please wait...", true, false);
+			if (mMode.equals(Util.SEARCH)) mDialog = ProgressDialog.show(MainActivity.this, "Searching Code", "Please wait...", true, false);
 		};
 		
 		@Override
@@ -226,20 +219,18 @@ public class MainActivity extends Activity {
 			ArrayList<StockList> result = null;
 
 			datasource.open();
-			
-			if (mMode.equals(Util.GAINER)) {
-				result = datasource.getGainers();
-			} else if (mMode.equals(Util.LOSER)) {
-				result = datasource.getLosers();
-			} else if (mMode.equals(Util.SEARCH)){
-				result = datasource.getByCode(mInputCode);
-			} else {
-				result = datasource.getAll();
-			} 
-			
-			if (result.size() != 0) {
-				mDate = result.get(0).getDate();
-			}
+				if (mMode.equals(Util.GAINER)) {
+					result = datasource.getGainers();
+				} else if (mMode.equals(Util.LOSER)) {
+					result = datasource.getLosers();
+				} else if (mMode.equals(Util.SEARCH)){
+					result = datasource.getByCode(mInputCode);
+				} else if (mMode.equals(Util.WATCHLIST)) {
+					result = datasource.getWatchList();
+				} else {
+					result = datasource.getAll();
+				} 
+				mDate = datasource.getDate();
 			datasource.close();
 			
 			return result;
@@ -247,19 +238,15 @@ public class MainActivity extends Activity {
 		
 		@Override
 		protected void onPostExecute(ArrayList<StockList> result) {
-			if (result.size() != 0) {
-				mItems = result;
-			} else {
-				Toast.makeText(MainActivity.this, "Code not found!", Toast.LENGTH_SHORT).show();
-			}
+			if (result.size() == 0 && mMode.equals(Util.SEARCH)) Toast.makeText(MainActivity.this, "Code not found!", Toast.LENGTH_SHORT).show();
 			
 			mAsOfTextView = (TextView) findViewById(R.id.tvAsOf);
 			mAsOfTextView.setText(mDate);
 
 			final ListView listview = (ListView) findViewById(R.id.listView);
-			listview.setAdapter(new StockAdapter(MainActivity.this, mItems));
+			listview.setAdapter(new StockAdapter(MainActivity.this, result));
 			
-			mDialog.dismiss();
+			if (mMode.equals(Util.SEARCH)) mDialog.dismiss();
 		}
 		
 	}
