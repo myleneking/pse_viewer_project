@@ -43,19 +43,6 @@ public class StockDataSource {
 		mContext.deleteDatabase(MySQLiteHelper.DATABASE_NAME);
 	}
 	
-	public void addStock(StockList stock) {
-		ContentValues values = new ContentValues();
-		
-		values.put(MySQLiteHelper.COLUMN_NAME, stock.getName());
-		values.put(MySQLiteHelper.COLUMN_SYMBOL, stock.getCode());
-		values.put(MySQLiteHelper.COLUMN_PERCENT_CHANGE, stock.getPercentChange());
-		values.put(MySQLiteHelper.COLUMN_PRICE, stock.getPrice());
-		values.put(MySQLiteHelper.COLUMN_VOLUME, stock.getVolume());
-		values.put(MySQLiteHelper.COLUMN_AS_OF, stock.getDate());
-		
-		database.insert(MySQLiteHelper.TABLE_STOCKS, null, values);
-	}
-	
 	public void updateStock(StockList stock, String code) {
 		ContentValues values = new ContentValues();
 		
@@ -66,8 +53,13 @@ public class StockDataSource {
 		values.put(MySQLiteHelper.COLUMN_VOLUME, stock.getVolume());
 		values.put(MySQLiteHelper.COLUMN_AS_OF, stock.getDate());
 		
-		String whereClause = MySQLiteHelper.COLUMN_ID + "='" + code + "'";
-		database.update(MySQLiteHelper.TABLE_STOCKS, values, whereClause, null);
+		ArrayList<StockList> result = this.getByCode(code);
+		if (result.size() != 0) {
+			String whereClause = MySQLiteHelper.COLUMN_ID + "='" + code + "'";
+			database.update(MySQLiteHelper.TABLE_STOCKS, values, whereClause, null);
+		} else {
+			database.insert(MySQLiteHelper.TABLE_STOCKS, null, values);
+		}
 	}
 	
 	private StockList cursorToStock(Cursor cursor) {

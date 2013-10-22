@@ -22,7 +22,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -165,11 +164,7 @@ public class MainActivity extends Activity {
 					//Save to database
 					if (mName != null && mCode != null && mPercentChange != null && mPrice != null && mVolume != null && mDate != null) {
 						datasource.open();
-						if (StockPreference.loadDatabaseUpdateStatus()) {
-							datasource.updateStock(stockRow, mCode);
-						} else {
-							datasource.addStock(stockRow);
-						}
+						datasource.updateStock(stockRow, mCode);
 						datasource.close();
 					}
 				}
