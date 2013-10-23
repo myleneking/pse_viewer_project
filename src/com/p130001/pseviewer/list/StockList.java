@@ -1,17 +1,18 @@
 package com.p130001.pseviewer.list;
 
 public class StockList {
-	private String mName, mCode, mPercentChange, mPrice, mVolume, mDate,
-			mWatchFlg;
+	private String mName, mCode, mPercentChange, mVolume, mCurrency, mAmount,
+			mDate, mWatchFlg;
 	private long mId;
 
 	public StockList(String name, String code, String percentChange,
-			String price, String volume, String date) {
+			String volume, String currency, String amount, String date) {
 		this.mName = name;
 		this.mCode = code;
 		this.mPercentChange = percentChange;
-		this.mPrice = price;
 		this.mVolume = volume;
+		this.mCurrency = currency;
+		this.mAmount = amount;
 		this.mDate = date;
 	}
 
@@ -35,12 +36,16 @@ public class StockList {
 		return this.mPercentChange;
 	}
 
-	public String getPrice() {
-		return this.mPrice;
-	}
-
 	public String getVolume() {
 		return this.mVolume;
+	}
+
+	public String getCurrency() {
+		return this.mCurrency;
+	}
+
+	public String getAmount() {
+		return this.mAmount;
 	}
 
 	public String getDate() {
@@ -67,12 +72,16 @@ public class StockList {
 		this.mPercentChange = string;
 	}
 
-	public void setPrice(String string) {
-		this.mPrice = string;
-	}
-
 	public void setVolume(String string) {
 		this.mVolume = string;
+	}
+
+	public void setCurrency(String string) {
+		this.mCurrency = string;
+	}
+
+	public void setAmount(String string) {
+		this.mAmount = string;
 	}
 
 	public void setDate(String string) {

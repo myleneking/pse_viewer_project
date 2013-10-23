@@ -20,8 +20,9 @@ public class StockDataSource {
 			MySQLiteHelper.COLUMN_NAME,
 			MySQLiteHelper.COLUMN_SYMBOL,
 			MySQLiteHelper.COLUMN_PERCENT_CHANGE,
-			MySQLiteHelper.COLUMN_PRICE,
 			MySQLiteHelper.COLUMN_VOLUME,
+			MySQLiteHelper.COLUMN_CURRENCY,
+			MySQLiteHelper.COLUMN_AMOUNT,
 			MySQLiteHelper.COLUMN_AS_OF,
 			MySQLiteHelper.COLUMN_WATCH_FLG
 	};
@@ -49,13 +50,14 @@ public class StockDataSource {
 		values.put(MySQLiteHelper.COLUMN_NAME, stock.getName());
 		values.put(MySQLiteHelper.COLUMN_SYMBOL, stock.getCode());
 		values.put(MySQLiteHelper.COLUMN_PERCENT_CHANGE, stock.getPercentChange());
-		values.put(MySQLiteHelper.COLUMN_PRICE, stock.getPrice());
 		values.put(MySQLiteHelper.COLUMN_VOLUME, stock.getVolume());
+		values.put(MySQLiteHelper.COLUMN_CURRENCY, stock.getCurrency());
+		values.put(MySQLiteHelper.COLUMN_AMOUNT, stock.getAmount());
 		values.put(MySQLiteHelper.COLUMN_AS_OF, stock.getDate());
 		
 		ArrayList<StockList> result = this.getByCode(code);
 		if (result.size() != 0) {
-			String whereClause = MySQLiteHelper.COLUMN_ID + "='" + code + "'";
+			String whereClause = MySQLiteHelper.COLUMN_SYMBOL + "='" + code + "'";
 			database.update(MySQLiteHelper.TABLE_STOCKS, values, whereClause, null);
 		} else {
 			database.insert(MySQLiteHelper.TABLE_STOCKS, null, values);
@@ -68,10 +70,11 @@ public class StockDataSource {
 		stock.setName(cursor.getString(1));
 		stock.setCode(cursor.getString(2));
 		stock.setPercentChange(cursor.getString(3));
-		stock.setPrice(cursor.getString(4));
-		stock.setVolume(cursor.getString(5));
-		stock.setDate(cursor.getString(6));
-		stock.setWatchFlg(cursor.getString(7));
+		stock.setVolume(cursor.getString(4));
+		stock.setCurrency(cursor.getString(5));
+		stock.setAmount(cursor.getString(6));
+		stock.setDate(cursor.getString(7));
+		stock.setWatchFlg(cursor.getString(8));
 		
 		return stock;
 	}

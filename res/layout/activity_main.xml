@@ -3,11 +3,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <TextView
+        android:id="@+id/tvHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:background="@color/black"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:text="PSE Viewer"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/llAsOf" >
+        android:layout_above="@+id/llAsOf"
+        android:layout_below="@+id/tvHeader"
+        android:background="@color/white"
+        android:cacheColorHint="@android:color/transparent"
+        android:listSelector="@android:color/transparent" >
     </ListView>
 
     <LinearLayout
@@ -15,20 +32,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/black"
-        android:orientation="horizontal" >
+        android:layout_margin="0dp"
+        android:background="@color/black"
+        android:orientation="horizontal"
+        android:padding="5dp" >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Updated as of: "
-            android:textColor="@android:color/white" />
+            android:textColor="@color/white" />
 
         <TextView
             android:id="@+id/tvAsOf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/white" />
+            android:textColor="@color/white" />
     </LinearLayout>
 
 </RelativeLayout>

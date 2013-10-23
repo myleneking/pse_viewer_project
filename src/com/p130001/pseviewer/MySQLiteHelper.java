@@ -15,7 +15,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_SYMBOL = Tag.SYMBOL;
 	public static final String COLUMN_PERCENT_CHANGE = Tag.PERCENT_CHANGE;
 	public static final String COLUMN_VOLUME = Tag.VOLUME;
-	public static final String COLUMN_PRICE = Tag.PRICE;
+	public static final String COLUMN_CURRENCY = Tag.CURRENCY;
+	public static final String COLUMN_AMOUNT = Tag.AMOUNT;
 	public static final String COLUMN_AS_OF = Tag.AS_OF;
 	public static final String COLUMN_WATCH_FLG = "watch_flg";
 	
@@ -29,7 +30,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_SYMBOL + " text not null, "
 			+ COLUMN_PERCENT_CHANGE + " text not null, "
 			+ COLUMN_VOLUME + " text not null, "
-			+ COLUMN_PRICE + " text not null, "
+			+ COLUMN_CURRENCY + " text not null, "
+			+ COLUMN_AMOUNT + " text not null, "
 			+ COLUMN_AS_OF + " text not null,"
 			+ COLUMN_WATCH_FLG + " text not null default 0"
 			+ ");";

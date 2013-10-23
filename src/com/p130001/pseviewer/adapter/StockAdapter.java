@@ -46,11 +46,12 @@ public class StockAdapter extends BaseAdapter{
 
 		View rowView = inflater.inflate(R.layout.row_item, parent, false);
 		
-		TextView tvName = (TextView) rowView.findViewById(R.id.tvName);
 		TextView tvCode = (TextView) rowView.findViewById(R.id.tvCode);
+		TextView tvName = (TextView) rowView.findViewById(R.id.tvName);
 		TextView tvPercentChange = (TextView) rowView.findViewById(R.id.tvPercentChange);
-		TextView tvPrice = (TextView) rowView.findViewById(R.id.tvPrice);
 		TextView tvVolume = (TextView) rowView.findViewById(R.id.tvVolume);
+		TextView tvCurrency = (TextView) rowView.findViewById(R.id.tvCurrency);
+		TextView tvAmount = (TextView) rowView.findViewById(R.id.tvAmount);
 		ImageView ivArrow = (ImageView) rowView.findViewById(R.id.ivArrow);
 		ToggleButton tbWatch = (ToggleButton) rowView.findViewById(R.id.tbWatchList);
 
@@ -65,24 +66,27 @@ public class StockAdapter extends BaseAdapter{
 			color = R.color.green;
 			arrow = R.drawable.img_arrow_up;
 		} else {
-			color = R.color.blue;
+			color = R.color.black;
 			arrow = R.drawable.img_arrow;
 		}
 
-		tvName.setText(item.getName());
-		tvName.setTextColor(mContext.getResources().getColor(color));
-		
 		tvCode.setText(item.getCode());
 		tvCode.setTextColor(mContext.getResources().getColor(color));
+		
+		tvName.setText(item.getName());
+		tvName.setTextColor(mContext.getResources().getColor(color));
 		
 		tvPercentChange.setText(item.getPercentChange());
 		tvPercentChange.setTextColor(mContext.getResources().getColor(color));
 		
-		tvPrice.setText(item.getPrice());
-		tvPrice.setTextColor(mContext.getResources().getColor(color));
-		
 		tvVolume.setText(item.getVolume());
 		tvVolume.setTextColor(mContext.getResources().getColor(color));
+
+		tvCurrency.setText(item.getCurrency());
+		tvCurrency.setTextColor(mContext.getResources().getColor(color));
+		
+		tvAmount.setText(item.getAmount());
+		tvAmount.setTextColor(mContext.getResources().getColor(color));
 		
 		ivArrow.setImageResource(arrow);
 		

@@ -31,7 +31,7 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-	private String mJStringNew, mName, mCode, mPrice, mPercentChange, mVolume, mDate;
+	private String mJStringNew, mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate;
 	private TextView mAsOfTextView;
 
 	@Override
@@ -154,15 +154,14 @@ public class MainActivity extends Activity {
 					mPercentChange = stock.getString(Tag.PERCENT_CHANGE);
 					mVolume = stock.getString(Tag.VOLUME);
 
-					JSONObject price = stock.getJSONObject("price");
-					String currency = price.getString("currency");
-					String amount = price.getString("amount");
-					mPrice = currency + " " + amount;
+					JSONObject price = stock.getJSONObject(Tag.PRICE);
+					mCurrency = price.getString(Tag.CURRENCY);
+					mAmount = price.getString(Tag.AMOUNT);
 
-					StockList stockRow = new StockList(mName, mCode, mPercentChange, mPrice, mVolume, mDate);
+					StockList stockRow = new StockList(mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate);
 					
 					//Save to database
-					if (mName != null && mCode != null && mPercentChange != null && mPrice != null && mVolume != null && mDate != null) {
+					if (mName != null && mCode != null && mPercentChange != null && mVolume != null && mCurrency != null && mAmount != null && mDate != null) {
 						datasource.open();
 						datasource.updateStock(stockRow, mCode);
 						datasource.close();
