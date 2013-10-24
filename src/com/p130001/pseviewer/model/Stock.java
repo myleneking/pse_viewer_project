@@ -1,11 +1,11 @@
-package com.p130001.pseviewer.list;
+package com.p130001.pseviewer.model;
 
-public class StockList {
+public class Stock {
 	private String mName, mCode, mPercentChange, mVolume, mCurrency, mAmount,
 			mDate, mWatchFlg;
 	private long mId;
 
-	public StockList(String name, String code, String percentChange,
+	public Stock(String name, String code, String percentChange,
 			String volume, String currency, String amount, String date) {
 		this.mName = name;
 		this.mCode = code;
@@ -16,7 +16,7 @@ public class StockList {
 		this.mDate = date;
 	}
 
-	public StockList() {
+	public Stock() {
 		// TODO Auto-generated constructor stub
 	}
 

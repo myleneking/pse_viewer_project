@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.p130001.pseviewer.R;
 import com.p130001.pseviewer.datasource.StockDataSource;
-import com.p130001.pseviewer.list.StockList;
+import com.p130001.pseviewer.model.Stock;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -20,16 +20,16 @@ import android.widget.ToggleButton;
 
 public class StockAdapter extends BaseAdapter{
 	private Context mContext;
-	private ArrayList<StockList> mItems;
+	private ArrayList<Stock> mItems;
 	private OnStockItemClickListener mListener;
 	
 	// Interface
 	public interface OnStockItemClickListener {
-		public void onStockItemClick(StockList item);
+		public void onStockItemClick(Stock item);
 	}
 	
 	// Constructor
-	public StockAdapter(Context c, ArrayList<StockList> items) {
+	public StockAdapter(Context c, ArrayList<Stock> items) {
 		mContext = c;
 		this.mItems = items;
 	}
@@ -38,7 +38,7 @@ public class StockAdapter extends BaseAdapter{
 		return mItems.size();
 	}
 
-	public StockList getItem(int position) {
+	public Stock getItem(int position) {
 		return mItems.get(position);
 	}
 
@@ -70,7 +70,7 @@ public class StockAdapter extends BaseAdapter{
 		ImageView ivArrow = (ImageView) rowView.findViewById(R.id.ivArrow);
 		ToggleButton tbWatch = (ToggleButton) rowView.findViewById(R.id.tbWatchList);
 
-		final StockList item = this.mItems.get(position);
+		final Stock item = this.mItems.get(position);
 		double percentChange = Double.parseDouble(item.getPercentChange());
 		int color, arrow;
 		

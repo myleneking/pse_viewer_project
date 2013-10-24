@@ -2,7 +2,7 @@ package com.p130001.pseviewer.datasource;
 
 import java.util.ArrayList;
 import com.p130001.pseviewer.MySQLiteHelper;
-import com.p130001.pseviewer.list.StockList;
+import com.p130001.pseviewer.model.Stock;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -44,7 +44,7 @@ public class StockDataSource {
 		mContext.deleteDatabase(MySQLiteHelper.DATABASE_NAME);
 	}
 	
-	public void updateStock(StockList stock, String code) {
+	public void updateStock(Stock stock, String code) {
 		ContentValues values = new ContentValues();
 		
 		values.put(MySQLiteHelper.COLUMN_NAME, stock.getName());
@@ -55,7 +55,7 @@ public class StockDataSource {
 		values.put(MySQLiteHelper.COLUMN_AMOUNT, stock.getAmount());
 		values.put(MySQLiteHelper.COLUMN_AS_OF, stock.getDate());
 		
-		ArrayList<StockList> result = this.getByCode(code);
+		ArrayList<Stock> result = this.getByCode(code);
 		if (result.size() != 0) {
 			String whereClause = MySQLiteHelper.COLUMN_SYMBOL + "='" + code + "'";
 			database.update(MySQLiteHelper.TABLE_STOCKS, values, whereClause, null);
@@ -64,8 +64,8 @@ public class StockDataSource {
 		}
 	}
 	
-	private StockList cursorToStock(Cursor cursor) {
-		StockList stock = new StockList();
+	private Stock cursorToStock(Cursor cursor) {
+		Stock stock = new Stock();
 		stock.setId(cursor.getLong(0));
 		stock.setName(cursor.getString(1));
 		stock.setCode(cursor.getString(2));
@@ -79,13 +79,13 @@ public class StockDataSource {
 		return stock;
 	}
 	
-	public ArrayList<StockList> getAll() {
-		ArrayList<StockList> stocks = new ArrayList<StockList>();
+	public ArrayList<Stock> getAll() {
+		ArrayList<Stock> stocks = new ArrayList<Stock>();
 
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , null, null, null, null, null);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
-			StockList stock = cursorToStock(cursor);
+			Stock stock = cursorToStock(cursor);
 			stocks.add(stock);
 			cursor.moveToNext();
 		}
@@ -94,14 +94,14 @@ public class StockDataSource {
 		return stocks;
 	}
 
-	public ArrayList<StockList> getGainers() {
-		ArrayList<StockList> gainers = new ArrayList<StockList>();
+	public ArrayList<Stock> getGainers() {
+		ArrayList<Stock> gainers = new ArrayList<Stock>();
 
 		String selectQuery = MySQLiteHelper.COLUMN_PERCENT_CHANGE + "> 0";
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , selectQuery , null, null, null, null);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
-			StockList stock = cursorToStock(cursor);
+			Stock stock = cursorToStock(cursor);
 			gainers.add(stock);
 			cursor.moveToNext();
 		}
@@ -110,14 +110,14 @@ public class StockDataSource {
 		return gainers;
 	}
 	
-	public ArrayList<StockList> getLosers() {
-		ArrayList<StockList> losers = new ArrayList<StockList>();
+	public ArrayList<Stock> getLosers() {
+		ArrayList<Stock> losers = new ArrayList<Stock>();
 
 		String selectQuery = MySQLiteHelper.COLUMN_PERCENT_CHANGE + "< 0";
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , selectQuery , null, null, null, null);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
-			StockList stock = cursorToStock(cursor);
+			Stock stock = cursorToStock(cursor);
 			losers.add(stock);
 			cursor.moveToNext();
 		}
@@ -126,13 +126,13 @@ public class StockDataSource {
 		return losers;
 	}
 
-	public ArrayList<StockList> getByCode(String code) {
-		ArrayList<StockList> search = new ArrayList<StockList>();
+	public ArrayList<Stock> getByCode(String code) {
+		ArrayList<Stock> search = new ArrayList<Stock>();
 		String selectQuery = MySQLiteHelper.COLUMN_SYMBOL + "= '" + code + "'";
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , selectQuery , null, null, null, null);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
-			StockList stock = cursorToStock(cursor);
+			Stock stock = cursorToStock(cursor);
 			search.add(stock);
 			cursor.moveToNext();
 		}
@@ -157,14 +157,14 @@ public class StockDataSource {
 		database.update(MySQLiteHelper.TABLE_STOCKS, values, whereClause, null);
 	}
 
-	public ArrayList<StockList> getWatchList() {
-		ArrayList<StockList> watchList = new ArrayList<StockList>();
+	public ArrayList<Stock> getWatchList() {
+		ArrayList<Stock> watchList = new ArrayList<Stock>();
 
 		String selectQuery = MySQLiteHelper.COLUMN_WATCH_FLG + "= 1";
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , selectQuery , null, null, null, null);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
-			StockList stock = cursorToStock(cursor);
+			Stock stock = cursorToStock(cursor);
 			watchList.add(stock);
 			cursor.moveToNext();
 		}

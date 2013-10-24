@@ -33,7 +33,7 @@ import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.adapter.StockAdapter;
 import com.p130001.pseviewer.adapter.StockAdapter.OnStockItemClickListener;
 import com.p130001.pseviewer.datasource.StockDataSource;
-import com.p130001.pseviewer.list.StockList;
+import com.p130001.pseviewer.model.Stock;
 
 public class MainActivity extends Activity {
 
@@ -164,7 +164,7 @@ public class MainActivity extends Activity {
 					mCurrency = price.getString(Tag.CURRENCY);
 					mAmount = price.getString(Tag.AMOUNT);
 
-					StockList stockRow = new StockList(mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate);
+					Stock stockRow = new Stock(mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate);
 					
 					//Save to database
 					if (mName != null && mCode != null && mPercentChange != null && mVolume != null && mCurrency != null && mAmount != null && mDate != null) {
@@ -192,7 +192,7 @@ public class MainActivity extends Activity {
 		}
 	}
 	
-	public class LoadStockFromDatabase extends AsyncTask<String, Integer, ArrayList<StockList>> {
+	public class LoadStockFromDatabase extends AsyncTask<String, Integer, ArrayList<Stock>> {
 
 		ProgressDialog mDialog;
 		String mMode;
@@ -213,10 +213,10 @@ public class MainActivity extends Activity {
 		};
 		
 		@Override
-		protected ArrayList<StockList> doInBackground(String... params) {
+		protected ArrayList<Stock> doInBackground(String... params) {
 			
 			StockDataSource datasource = new StockDataSource(MainActivity.this);
-			ArrayList<StockList> result = null;
+			ArrayList<Stock> result = null;
 
 			datasource.open();
 				if (mMode.equals(Util.GAINER)) {
@@ -237,7 +237,7 @@ public class MainActivity extends Activity {
 		}
 		
 		@Override
-		protected void onPostExecute(ArrayList<StockList> result) {
+		protected void onPostExecute(ArrayList<Stock> result) {
 			if (result.size() == 0 && mMode.equals(Util.SEARCH)) Toast.makeText(MainActivity.this, "Code not found!", Toast.LENGTH_SHORT).show();
 			
 			mAsOfTextView = (TextView) findViewById(R.id.tvAsOf);
@@ -248,7 +248,7 @@ public class MainActivity extends Activity {
 			adapter.setOnStockItemClickListener(new OnStockItemClickListener() {
 
 				@Override
-				public void onStockItemClick(StockList item) {
+				public void onStockItemClick(Stock item) {
 					showOptionDialog();
 					//Toast.makeText(MainActivity.this, "item selected " + item.getName(), Toast.LENGTH_SHORT).show();
 				}
