@@ -9,6 +9,7 @@ import com.p130001.pseviewer.list.StockList;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
@@ -20,7 +21,13 @@ import android.widget.ToggleButton;
 public class StockAdapter extends BaseAdapter{
 	private Context mContext;
 	private ArrayList<StockList> mItems;
-
+	private OnStockItemClickListener mListener;
+	
+	// Interface
+	public interface OnStockItemClickListener {
+		public void onStockItemClick(StockList item);
+	}
+	
 	// Constructor
 	public StockAdapter(Context c, ArrayList<StockList> items) {
 		mContext = c;
@@ -38,13 +45,21 @@ public class StockAdapter extends BaseAdapter{
 	public long getItemId(int position) {
 		return 0;
 	}
+	
+	public void setOnStockItemClickListener(OnStockItemClickListener listener) {
+		this.mListener = listener;
+	}
 
 	public View getView(final int position, View convertView, ViewGroup parent) {
+		
+		View rowView = convertView;
+		
+		if (convertView == null) {
+			LayoutInflater inflater = (LayoutInflater) mContext
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		LayoutInflater inflater = (LayoutInflater) mContext
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-		View rowView = inflater.inflate(R.layout.row_item, parent, false);
+			rowView = inflater.inflate(R.layout.row_item, parent, false);
+		}
 		
 		TextView tvCode = (TextView) rowView.findViewById(R.id.tvCode);
 		TextView tvName = (TextView) rowView.findViewById(R.id.tvName);
@@ -110,6 +125,17 @@ public class StockAdapter extends BaseAdapter{
 			}
 		});
 		
+		rowView.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if (mListener != null) {
+					mListener.onStockItemClick(item);
+				}
+			}
+		});
+		
 		return rowView;
 	}
+	
 }

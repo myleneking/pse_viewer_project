@@ -1,8 +1,29 @@
 package com.p130001.pseviewer.activity;
 
 import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.p130001.pseviewer.JSONParser;
 import com.p130001.pseviewer.R;
@@ -10,24 +31,9 @@ import com.p130001.pseviewer.StockPreference;
 import com.p130001.pseviewer.Tag;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.adapter.StockAdapter;
+import com.p130001.pseviewer.adapter.StockAdapter.OnStockItemClickListener;
 import com.p130001.pseviewer.datasource.StockDataSource;
 import com.p130001.pseviewer.list.StockList;
-
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -238,9 +244,39 @@ public class MainActivity extends Activity {
 			mAsOfTextView.setText(mDate);
 
 			final ListView listview = (ListView) findViewById(R.id.listView);
-			listview.setAdapter(new StockAdapter(MainActivity.this, result));
+			StockAdapter adapter = new StockAdapter(MainActivity.this, result);
+			adapter.setOnStockItemClickListener(new OnStockItemClickListener() {
+
+				@Override
+				public void onStockItemClick(StockList item) {
+					showOptionDialog();
+					//Toast.makeText(MainActivity.this, "item selected " + item.getName(), Toast.LENGTH_SHORT).show();
+				}
+			});
+			listview.setAdapter(adapter);
 			
 			if (mMode.equals(Util.SEARCH)) mDialog.dismiss();
+		}
+		
+		private void showOptionDialog() {
+			String options[] = { "Open Trends", "Add to watchlist", "other" };
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, options);
+			
+			AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+			final AlertDialog dialog = alert.create();
+			
+			ListView lv = new ListView(MainActivity.this);
+			lv.setAdapter(adapter);
+			lv.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					dialog.cancel();
+				}
+			});
+			
+			dialog.setView(lv);
+			dialog.show();
 		}
 		
 	}
