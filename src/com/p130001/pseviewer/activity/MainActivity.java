@@ -257,7 +257,7 @@ public class MainActivity extends Activity {
 
 				@Override
 				public void onStockItemClick(Stock item) {
-					showOptionDialog();
+					showOptionDialog(item);
 					//Toast.makeText(MainActivity.this, "item selected " + item.getName(), Toast.LENGTH_SHORT).show();
 				}
 			});
@@ -268,8 +268,8 @@ public class MainActivity extends Activity {
 			}
 		}
 		
-		private void showOptionDialog() {
-			String options[] = { "Open Trends", "Add to watchlist", "other" };
+		private void showOptionDialog(final Stock item) {
+			String options[] = { "Open Trends", "Remind Me", "Add To Watchlist" };
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, options);
 			
 			AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
@@ -281,6 +281,14 @@ public class MainActivity extends Activity {
 
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					switch (position) {
+					case 0:
+						GraphActivity.show(MainActivity.this, item.getCode());
+						break;
+
+					default:
+						break;
+					}
 					dialog.cancel();
 				}
 			});
