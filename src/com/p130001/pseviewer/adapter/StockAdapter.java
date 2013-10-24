@@ -76,15 +76,21 @@ public class StockAdapter extends BaseAdapter{
 		
 		if (percentChange < 0) {
 			color = R.color.red;
-			arrow = R.drawable.img_arrow_down;
+			arrow = R.drawable.img_arrow_down_colored;
 		} else if (percentChange > 0) {
 			color = R.color.green;
-			arrow = R.drawable.img_arrow_up;
+			arrow = R.drawable.img_arrow_up_colored;
 		} else {
 			color = R.color.black;
 			arrow = R.drawable.img_arrow;
 		}
-
+		
+		if (position == 0) {
+			rowView.findViewById(R.id.margin_view).setVisibility(View.VISIBLE);
+		} else {
+			rowView.findViewById(R.id.margin_view).setVisibility(View.GONE);
+		}
+		
 		tvCode.setText(item.getCode());
 		tvCode.setTextColor(mContext.getResources().getColor(color));
 		

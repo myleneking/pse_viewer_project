@@ -9,5 +9,7 @@
     <color name="rose">#E8ADAA</color>
     <color name="blue">#0000FF</color>
     <color name="light_blue">#ADDFFF</color>
+    <color name="gunmetal">#2C3539</color>
+    <color name="redfox">#C35817</color>
 
 </resources>

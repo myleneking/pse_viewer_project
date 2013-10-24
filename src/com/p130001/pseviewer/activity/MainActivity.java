@@ -17,11 +17,18 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.animation.AnimationUtils;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,15 +42,15 @@ import com.p130001.pseviewer.adapter.StockAdapter.OnStockItemClickListener;
 import com.p130001.pseviewer.datasource.StockDataSource;
 import com.p130001.pseviewer.model.Stock;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnClickListener {
 
 	private String mJStringNew, mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate;
 	private TextView mAsOfTextView;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		setContentView(R.layout.activity_main);
 		StockPreference.setupPrefs(this);
 			
@@ -55,6 +62,8 @@ public class MainActivity extends Activity {
 				new LoadStockFromDatabase(Util.ALL).execute();
 			}
 		}
+		
+		initialize();
 	}
 
 	private boolean isNetworkConnected() {
@@ -63,6 +72,48 @@ public class MainActivity extends Activity {
 				.getActiveNetworkInfo();
 
 		return activeNetworkInfo != null;
+	}
+	
+	private void initialize() {
+		ImageView ivSearch = (ImageView) findViewById(R.id.ivSearch);
+		ImageView ivReload = (ImageView) findViewById(R.id.ivReload);
+		ImageView ivGainers = (ImageView) findViewById(R.id.ivGainers);
+		ImageView ivLosers = (ImageView) findViewById(R.id.ivLosers);
+		ImageView ivWatchlist = (ImageView) findViewById(R.id.ivWatchList);
+		
+		ivSearch.setOnClickListener(this);
+		ivReload.setOnClickListener(this);
+		ivGainers.setOnClickListener(this);
+		ivLosers.setOnClickListener(this);
+		ivWatchlist.setOnClickListener(this);
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.ivSearch:
+			openSearchInputDialog();
+			break;
+		case R.id.ivReload:
+			if (isNetworkConnected()) {
+				new GetApiData().execute();
+			} else {
+				Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
+				new LoadStockFromDatabase(Util.ALL).execute();
+			}
+			break;
+		case R.id.ivGainers:
+			new LoadStockFromDatabase(Util.GAINER).execute();
+			break;
+		case R.id.ivLosers:
+			new LoadStockFromDatabase(Util.LOSER).execute();
+			break;
+		case R.id.ivWatchList:
+			new LoadStockFromDatabase(Util.WATCHLIST).execute();
+			break;
+		default:
+			break;
+		}
 	}
 
 	@Override
@@ -75,34 +126,11 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.action_reload:
-			if (isNetworkConnected()) {
-				new GetApiData().execute();
-			} else {
-				Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
-				new LoadStockFromDatabase(Util.ALL).execute();
-			}
+		case R.id.action_settings:
+			Toast.makeText(this, "Not yet available.", Toast.LENGTH_SHORT).show();
 			return true;
-		
-		case R.id.action_gainers:
-			new LoadStockFromDatabase(Util.GAINER).execute();
-			return true;
-		
-		case R.id.action_losers:
-			new LoadStockFromDatabase(Util.LOSER).execute();
-			return true;
-		
-		case R.id.action_search:
-			openSearchInputDialog();
-			return true;
-			
-		case R.id.action_watchlist:
-			new LoadStockFromDatabase(Util.WATCHLIST).execute();
-			return true;
-			
 		default:
 			return super.onOptionsItemSelected(item);
-
 		}
 	}
 
@@ -260,8 +288,38 @@ public class MainActivity extends Activity {
 					showOptionDialog(item);
 					//Toast.makeText(MainActivity.this, "item selected " + item.getName(), Toast.LENGTH_SHORT).show();
 				}
+
 			});
 			listview.setAdapter(adapter);
+			
+			listview.setOnScrollListener(new OnScrollListener() {
+				
+				@Override
+				public void onScrollStateChanged(AbsListView view, int scrollState) {
+					RelativeLayout header = (RelativeLayout) findViewById(R.id.rlHeader);
+					LinearLayout footer = (LinearLayout) findViewById(R.id.llFooter);
+					switch (scrollState) {
+					case OnScrollListener.SCROLL_STATE_IDLE:
+						header.setVisibility(View.VISIBLE);
+						header.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_up_in));
+						footer.setVisibility(View.VISIBLE);
+						footer.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_down_in));
+						break;
+					case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+						header.setVisibility(View.INVISIBLE);
+						header.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_down_out));
+						footer.setVisibility(View.INVISIBLE);
+						footer.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_up_out));
+						break;
+					default:
+						break;
+					}
+				}
+				
+				@Override
+				public void onScroll(AbsListView view, int firstVisibleItem,
+						int visibleItemCount, int totalItemCount) {}
+			});
 			
 			if (mMode.equals(Util.SEARCH)) {
 				mDialog.dismiss();
@@ -282,10 +340,17 @@ public class MainActivity extends Activity {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					switch (position) {
-					case 0:
+					case 0: // Open Trends
 						GraphActivity.show(MainActivity.this, item.getCode());
 						break;
-
+					case 1: // Remind Me
+						break;
+					case 2: // Add To Watchlist
+						StockDataSource datasource = new StockDataSource(MainActivity.this);
+						datasource.open();
+						datasource.addToWatchList(item.getCode());
+						datasource.close();
+						break;
 					default:
 						break;
 					}
@@ -298,5 +363,5 @@ public class MainActivity extends Activity {
 		}
 		
 	}
-	
+
 	}
