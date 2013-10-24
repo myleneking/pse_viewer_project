@@ -51,7 +51,9 @@ public class MainActivity extends Activity {
 			new GetApiData().execute();
 		} else {
 			Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
-			if (StockPreference.loadDatabaseUpdateStatus()) new LoadStockFromDatabase(Util.ALL).execute();
+			if (StockPreference.loadDatabaseUpdateStatus()) {
+				new LoadStockFromDatabase(Util.ALL).execute();
+			}
 		}
 	}
 
@@ -173,7 +175,9 @@ public class MainActivity extends Activity {
 						datasource.close();
 					}
 				}
-				if (!StockPreference.loadDatabaseUpdateStatus()) StockPreference.saveDatabaseUpdateStatus(true);;
+				if (!StockPreference.loadDatabaseUpdateStatus()) {
+					StockPreference.saveDatabaseUpdateStatus(true);;
+				}
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -209,7 +213,9 @@ public class MainActivity extends Activity {
 		
 		@Override
 		protected void onPreExecute() {
-			if (mMode.equals(Util.SEARCH)) mDialog = ProgressDialog.show(MainActivity.this, "Searching Code", "Please wait...", true, false);
+			if (mMode.equals(Util.SEARCH)) {
+				mDialog = ProgressDialog.show(MainActivity.this, "Searching Code", "Please wait...", true, false);
+			}
 		};
 		
 		@Override
@@ -238,7 +244,9 @@ public class MainActivity extends Activity {
 		
 		@Override
 		protected void onPostExecute(ArrayList<Stock> result) {
-			if (result.size() == 0 && mMode.equals(Util.SEARCH)) Toast.makeText(MainActivity.this, "Code not found!", Toast.LENGTH_SHORT).show();
+			if (result.size() == 0 && mMode.equals(Util.SEARCH)) {
+				Toast.makeText(MainActivity.this, "Code not found!", Toast.LENGTH_SHORT).show();
+			}
 			
 			mAsOfTextView = (TextView) findViewById(R.id.tvAsOf);
 			mAsOfTextView.setText(mDate);
@@ -255,7 +263,9 @@ public class MainActivity extends Activity {
 			});
 			listview.setAdapter(adapter);
 			
-			if (mMode.equals(Util.SEARCH)) mDialog.dismiss();
+			if (mMode.equals(Util.SEARCH)) {
+				mDialog.dismiss();
+			}
 		}
 		
 		private void showOptionDialog() {
