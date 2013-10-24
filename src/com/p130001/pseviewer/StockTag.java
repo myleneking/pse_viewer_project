@@ -1,6 +1,6 @@
 package com.p130001.pseviewer;
 
-public class Tag {
+public class StockTag {
 
 	public final static String STOCK = "stock";
 	public final static String NAME = "name";

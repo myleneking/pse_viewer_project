@@ -11,13 +11,13 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	
 	public static final String TABLE_STOCKS = "stocks";
 	public static final String COLUMN_ID = "id";
-	public static final String COLUMN_NAME = Tag.NAME;
-	public static final String COLUMN_SYMBOL = Tag.SYMBOL;
-	public static final String COLUMN_PERCENT_CHANGE = Tag.PERCENT_CHANGE;
-	public static final String COLUMN_VOLUME = Tag.VOLUME;
-	public static final String COLUMN_CURRENCY = Tag.CURRENCY;
-	public static final String COLUMN_AMOUNT = Tag.AMOUNT;
-	public static final String COLUMN_AS_OF = Tag.AS_OF;
+	public static final String COLUMN_NAME = StockTag.NAME;
+	public static final String COLUMN_SYMBOL = StockTag.SYMBOL;
+	public static final String COLUMN_PERCENT_CHANGE = StockTag.PERCENT_CHANGE;
+	public static final String COLUMN_VOLUME = StockTag.VOLUME;
+	public static final String COLUMN_CURRENCY = StockTag.CURRENCY;
+	public static final String COLUMN_AMOUNT = StockTag.AMOUNT;
+	public static final String COLUMN_AS_OF = StockTag.AS_OF;
 	public static final String COLUMN_WATCH_FLG = "watch_flg";
 	
 	private static final int DATABASE_VERSION = 1;

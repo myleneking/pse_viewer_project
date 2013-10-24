@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.p130001.pseviewer.JSONParser;
 import com.p130001.pseviewer.R;
 import com.p130001.pseviewer.StockPreference;
-import com.p130001.pseviewer.Tag;
+import com.p130001.pseviewer.StockTag;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.adapter.StockAdapter;
 import com.p130001.pseviewer.adapter.StockAdapter.OnStockItemClickListener;
@@ -157,14 +157,14 @@ public class MainActivity extends Activity {
 
 				for (int i = 0; i < stockArr.length(); i++) {
 					JSONObject stock = stockArr.getJSONObject(i);
-					mName = stock.getString(Tag.NAME);
-					mCode = stock.getString(Tag.SYMBOL);
-					mPercentChange = stock.getString(Tag.PERCENT_CHANGE);
-					mVolume = stock.getString(Tag.VOLUME);
+					mName = stock.getString(StockTag.NAME);
+					mCode = stock.getString(StockTag.SYMBOL);
+					mPercentChange = stock.getString(StockTag.PERCENT_CHANGE);
+					mVolume = stock.getString(StockTag.VOLUME);
 
-					JSONObject price = stock.getJSONObject(Tag.PRICE);
-					mCurrency = price.getString(Tag.CURRENCY);
-					mAmount = price.getString(Tag.AMOUNT);
+					JSONObject price = stock.getJSONObject(StockTag.PRICE);
+					mCurrency = price.getString(StockTag.CURRENCY);
+					mAmount = price.getString(StockTag.AMOUNT);
 
 					Stock stockRow = new Stock(mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate);
 					
