@@ -14,6 +14,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,7 +46,6 @@ import com.p130001.pseviewer.model.Stock;
 public class MainActivity extends Activity implements OnClickListener {
 
 	private String mJStringNew, mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate;
-	private TextView mAsOfTextView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +57,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		if (isNetworkConnected()) {
 			new GetApiData().execute();
 		} else {
-			Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
+			showNoConnectionDialog();
 			if (StockPreference.loadDatabaseUpdateStatus()) {
 				new LoadStockFromDatabase(Util.ALL).execute();
 			}
@@ -92,14 +92,13 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.ivSearch:
-			openSearchInputDialog();
+			showSearchInputDialog();
 			break;
 		case R.id.ivReload:
 			if (isNetworkConnected()) {
 				new GetApiData().execute();
 			} else {
-				Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
-				new LoadStockFromDatabase(Util.ALL).execute();
+				showNoConnectionDialog();
 			}
 			break;
 		case R.id.ivGainers:
@@ -134,7 +133,21 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	private void openSearchInputDialog() {
+	private void showNoConnectionDialog() {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		alert.setMessage("No Internet Connection.");
+		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				new LoadStockFromDatabase(Util.ALL).execute();
+				showAsOfDate();
+			}
+		});
+		alert.show();
+	}
+
+	private void showSearchInputDialog() {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		alert.setTitle("Search Code");
@@ -150,16 +163,26 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 		});
 
-		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				// Canceled.
-			}
-		});
-
+		alert.setNegativeButton("Cancel", null);
 		alert.show();
 	}
 
-	public class GetApiData extends AsyncTask<String, Integer, String>{
+	private void showAsOfDate() {
+		final LinearLayout asOfLayout = (LinearLayout) findViewById(R.id.llAsOf);
+		asOfLayout.setVisibility(View.VISIBLE);
+		asOfLayout.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_left_in));
+		
+		new Handler().postDelayed(new Runnable() {
+			
+			@Override
+			public void run() {
+				asOfLayout.setVisibility(View.INVISIBLE);
+				asOfLayout.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_right_out));
+			}
+		}, 3000);
+	}
+	
+	public class GetApiData extends AsyncTask<String, Integer, String> {
 
 		ProgressDialog mDialog;
 		
@@ -276,9 +299,9 @@ public class MainActivity extends Activity implements OnClickListener {
 				Toast.makeText(MainActivity.this, "Code not found!", Toast.LENGTH_SHORT).show();
 			}
 			
-			mAsOfTextView = (TextView) findViewById(R.id.tvAsOf);
+			TextView mAsOfTextView = (TextView) findViewById(R.id.tvAsOf);
 			mAsOfTextView.setText(mDate);
-
+			
 			final ListView listview = (ListView) findViewById(R.id.listView);
 			StockAdapter adapter = new StockAdapter(MainActivity.this, result);
 			adapter.setOnStockItemClickListener(new OnStockItemClickListener() {
@@ -325,7 +348,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				mDialog.dismiss();
 			}
 		}
-		
+
 		private void showOptionDialog(final Stock item) {
 			String options[] = { "Open Trends", "Remind Me", "Add To Watchlist" };
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, options);
