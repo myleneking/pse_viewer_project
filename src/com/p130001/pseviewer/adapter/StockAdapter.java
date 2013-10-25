@@ -97,7 +97,7 @@ public class StockAdapter extends BaseAdapter{
 		tvName.setText(item.getName());
 		tvName.setTextColor(mContext.getResources().getColor(color));
 		
-		tvPercentChange.setText(item.getPercentChange());
+		tvPercentChange.setText(item.getPercentChange() + "%");
 		tvPercentChange.setTextColor(mContext.getResources().getColor(color));
 		
 		tvVolume.setText(item.getVolume());
@@ -106,7 +106,7 @@ public class StockAdapter extends BaseAdapter{
 		tvCurrency.setText(item.getCurrency());
 		tvCurrency.setTextColor(mContext.getResources().getColor(color));
 		
-		tvAmount.setText(item.getAmount());
+		tvAmount.setText(String.format("%.2f",  Double.parseDouble(item.getAmount())));
 		tvAmount.setTextColor(mContext.getResources().getColor(color));
 		
 		ivArrow.setImageResource(arrow);
