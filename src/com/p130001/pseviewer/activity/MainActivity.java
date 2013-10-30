@@ -230,7 +230,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		@Override
 		protected void onPostExecute(String result) {
 			mDialog.dismiss();
-			new LoadStockFromDatabase(mMode).execute();
+			new LoadStockFromDatabase().execute();
 		}
 	}
 	
