@@ -141,7 +141,9 @@ public class MainActivity extends Activity implements OnClickListener {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String code = input.getText().toString().toUpperCase();
 				StockPreference.saveActivityMode(Util.SEARCH);
+				if (StockPreference.loadDatabaseUpdateStatus()) {
 				new LoadStockFromDatabase(code).execute();
+			}
 			}
 		});
 
