@@ -6,19 +6,20 @@
 
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="17" />
+        android:targetSdkVersion="10" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
+        android:configChanges="orientation|screenSize"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.NoTitleBar" >
+        
         <activity
-            android:name="com.p130001.pseviewer.activity.MainActivity"
-            android:configChanges="orientation|screenSize"
+            android:name="com.p130001.pseviewer.activity.SplashActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,11 +27,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.p130001.pseviewer.activity.GraphActivity"
-            android:configChanges="orientation|screenSize"
-            android:theme="@android:style/Theme.Light.NoTitleBar" >
-        </activity>
+        <activity android:name="com.p130001.pseviewer.activity.AllActivity" />
+        <activity android:name="com.p130001.pseviewer.activity.GainerActivity" />
+        <activity android:name="com.p130001.pseviewer.activity.LoserActivity" />
+        <activity android:name="com.p130001.pseviewer.activity.WatchListActivity" />
+        <activity android:name="com.p130001.pseviewer.activity.GraphActivity" />
     </application>
 
 </manifest>

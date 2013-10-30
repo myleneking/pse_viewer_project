@@ -3,13 +3,16 @@ package com.p130001.pseviewer.adapter;
 import java.util.ArrayList;
 
 import com.p130001.pseviewer.R;
+import com.p130001.pseviewer.StockPreference;
+import com.p130001.pseviewer.Util;
+import com.p130001.pseviewer.activity.WatchListActivity;
 import com.p130001.pseviewer.datasource.StockDataSource;
 import com.p130001.pseviewer.model.Stock;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
@@ -127,17 +130,24 @@ public class StockAdapter extends BaseAdapter{
 		        	//Toast.makeText(mContext, "removed: " + item.getCode(), Toast.LENGTH_SHORT).show();
 		        	datasource.removeToWatchList(item.getCode());
 		        }
+				
 				datasource.close();
+				
+				String mode = StockPreference.loadActivityMode();
+				if (mode.equals(Util.WATCHLIST)) {
+					WatchListActivity.show(mContext);
+				}
 			}
 		});
 		
-		rowView.setOnClickListener(new OnClickListener() {
+		rowView.setOnLongClickListener(new OnLongClickListener() {
 			
 			@Override
-			public void onClick(View v) {
+			public boolean onLongClick(View v) {
 				if (mListener != null) {
 					mListener.onStockItemClick(item);
 				}
+				return false;
 			}
 		});
 		

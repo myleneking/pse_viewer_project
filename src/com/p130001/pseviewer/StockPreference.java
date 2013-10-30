@@ -13,11 +13,22 @@ public class StockPreference {
         mPrefs = context.getSharedPreferences("stock", 0);
         mEditor = mPrefs.edit();
     }
+	
     public static void saveDatabaseUpdateStatus(boolean status) {
         mEditor.putBoolean("databaseUpdate", status);
         mEditor.commit();
     }
+    
     public static boolean loadDatabaseUpdateStatus() {
         return mPrefs.getBoolean("databaseUpdate", false);
+    }
+    
+    public static void saveActivityMode(String mode) {
+    	mEditor.putString("activityMode", mode);
+    	mEditor.commit();
+    }
+    
+    public static String loadActivityMode() {
+    	return mPrefs.getString("activityMode", Util.ALL);
     }
 }

@@ -45,7 +45,7 @@ import com.p130001.pseviewer.model.Stock;
 
 public class MainActivity extends Activity implements OnClickListener {
 
-	private String mJStringNew, mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate;
+	protected String mJStringNew, mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,19 +54,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_main);
 		StockPreference.setupPrefs(this);
 			
-		if (isNetworkConnected()) {
-			new GetApiData().execute();
-		} else {
-			showNoConnectionDialog();
-			if (StockPreference.loadDatabaseUpdateStatus()) {
-				new LoadStockFromDatabase(Util.ALL).execute();
-			}
-		}
-		
 		initialize();
 	}
 
-	private boolean isNetworkConnected() {
+	protected boolean isNetworkConnected() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetworkInfo = connectivityManager
 				.getActiveNetworkInfo();
@@ -74,7 +65,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		return activeNetworkInfo != null;
 	}
 	
-	private void initialize() {
+	protected void initialize() {
 		ImageView ivSearch = (ImageView) findViewById(R.id.ivSearch);
 		ImageView ivReload = (ImageView) findViewById(R.id.ivReload);
 		ImageView ivGainers = (ImageView) findViewById(R.id.ivGainers);
@@ -95,20 +86,16 @@ public class MainActivity extends Activity implements OnClickListener {
 			showSearchInputDialog();
 			break;
 		case R.id.ivReload:
-			if (isNetworkConnected()) {
-				new GetApiData().execute();
-			} else {
-				showNoConnectionDialog();
-			}
+			AllActivity.show(this);
 			break;
 		case R.id.ivGainers:
-			new LoadStockFromDatabase(Util.GAINER).execute();
+			GainerActivity.show(this);
 			break;
 		case R.id.ivLosers:
-			new LoadStockFromDatabase(Util.LOSER).execute();
+			LoserActivity.show(this);
 			break;
 		case R.id.ivWatchList:
-			new LoadStockFromDatabase(Util.WATCHLIST).execute();
+			WatchListActivity.show(this);
 			break;
 		default:
 			break;
@@ -128,26 +115,20 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.action_settings:
 			Toast.makeText(this, "Not yet available.", Toast.LENGTH_SHORT).show();
 			return true;
+		case R.id.action_exit:
+			finish();
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
-
-	private void showNoConnectionDialog() {
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-		alert.setMessage("No Internet Connection.");
-		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				new LoadStockFromDatabase(Util.ALL).execute();
-				showAsOfDate();
-			}
-		});
-		alert.show();
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		overridePendingTransition(0, 0);
 	}
-
-	private void showSearchInputDialog() {
+	
+	protected void showSearchInputDialog() {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		alert.setTitle("Search Code");
@@ -159,7 +140,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String code = input.getText().toString().toUpperCase();
-				new LoadStockFromDatabase(Util.SEARCH, code).execute();
+				new LoadStockFromDatabase(code).execute();
 			}
 		});
 
@@ -167,7 +148,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		alert.show();
 	}
 
-	private void showAsOfDate() {
+	protected void showAsOfDate() {
 		final LinearLayout asOfLayout = (LinearLayout) findViewById(R.id.llAsOf);
 		asOfLayout.setVisibility(View.VISIBLE);
 		asOfLayout.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_left_in));
@@ -185,10 +166,15 @@ public class MainActivity extends Activity implements OnClickListener {
 	public class GetApiData extends AsyncTask<String, Integer, String> {
 
 		ProgressDialog mDialog;
+		String mMode;
+		
+		public GetApiData() {
+			this.mMode = StockPreference.loadActivityMode();;
+		}
 		
 		@Override
 		protected void onPreExecute() {
-			mDialog = ProgressDialog.show(MainActivity.this, "Fetching Data", "Please wait...", true, false);
+			mDialog = ProgressDialog.show(MainActivity.this, "", "Loading...");
 		}
 		
 		@Override
@@ -243,7 +229,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		@Override
 		protected void onPostExecute(String result) {
 			mDialog.dismiss();
-			new LoadStockFromDatabase(Util.ALL).execute();
+			new LoadStockFromDatabase(mMode).execute();
 		}
 	}
 	
@@ -253,19 +239,19 @@ public class MainActivity extends Activity implements OnClickListener {
 		String mMode;
 		String mInputCode;
 		
-		public LoadStockFromDatabase(String mode) {
-			this.mMode = mode;
+		public LoadStockFromDatabase() {
+			this.mMode = StockPreference.loadActivityMode();
 		}
 		
-		public LoadStockFromDatabase(String mode, String code) {
-			this.mMode = mode;
+		public LoadStockFromDatabase(String code) {
+			this.mMode = StockPreference.loadActivityMode();
 			this.mInputCode = code;
 		}
 		
 		@Override
 		protected void onPreExecute() {
 			if (mMode.equals(Util.SEARCH)) {
-				mDialog = ProgressDialog.show(MainActivity.this, "Searching Code", "Please wait...", true, false);
+				mDialog = ProgressDialog.show(MainActivity.this, "", "Searching...");
 			}
 		};
 		
@@ -350,7 +336,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 
 		private void showOptionDialog(final Stock item) {
-			String options[] = { "Open Trends", "Remind Me", "Add To Watchlist" };
+			String options[] = { "Open Trends", "Remind Me" };
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, options);
 			
 			AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
@@ -367,12 +353,6 @@ public class MainActivity extends Activity implements OnClickListener {
 						GraphActivity.show(MainActivity.this, item.getCode());
 						break;
 					case 1: // Remind Me
-						break;
-					case 2: // Add To Watchlist
-						StockDataSource datasource = new StockDataSource(MainActivity.this);
-						datasource.open();
-						datasource.addToWatchList(item.getCode());
-						datasource.close();
 						break;
 					default:
 						break;
