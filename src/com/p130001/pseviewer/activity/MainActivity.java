@@ -140,6 +140,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String code = input.getText().toString().toUpperCase();
+				StockPreference.saveActivityMode(Util.SEARCH);
 				new LoadStockFromDatabase(code).execute();
 			}
 		});
