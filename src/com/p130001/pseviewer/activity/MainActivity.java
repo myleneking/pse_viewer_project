@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -43,9 +44,13 @@ import com.p130001.pseviewer.adapter.StockAdapter.OnStockItemClickListener;
 import com.p130001.pseviewer.datasource.StockDataSource;
 import com.p130001.pseviewer.model.Stock;
 
-public class MainActivity extends Activity implements OnClickListener {
+public class MainActivity extends Activity implements OnClickListener, OnLongClickListener {
 
-	protected String mJStringNew, mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate;
+	protected String mJStringNew, mName, mCode, mCurrency, mDate;
+	protected Integer mVolume;
+	protected Double mPercentChange, mAmount;
+	private static String ASC_ORDER = "asc";
+	private static String DESC_ORDER = "desc";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,16 +72,20 @@ public class MainActivity extends Activity implements OnClickListener {
 	
 	protected void initialize() {
 		ImageView ivSearch = (ImageView) findViewById(R.id.ivSearch);
+		ImageView ivSort = (ImageView) findViewById(R.id.ivSort);
 		ImageView ivReload = (ImageView) findViewById(R.id.ivReload);
 		ImageView ivGainers = (ImageView) findViewById(R.id.ivGainers);
 		ImageView ivLosers = (ImageView) findViewById(R.id.ivLosers);
 		ImageView ivWatchlist = (ImageView) findViewById(R.id.ivWatchList);
 		
 		ivSearch.setOnClickListener(this);
+		ivSort.setOnClickListener(this);
 		ivReload.setOnClickListener(this);
 		ivGainers.setOnClickListener(this);
 		ivLosers.setOnClickListener(this);
 		ivWatchlist.setOnClickListener(this);
+		
+		ivSort.setOnLongClickListener(this);
 	}
 
 	@Override
@@ -84,6 +93,15 @@ public class MainActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.ivSearch:
 			showSearchInputDialog();
+			break;
+		case R.id.ivSort:
+			String sortMode = StockPreference.getSortMode();
+			if (sortMode.equals(ASC_ORDER)) {
+				StockPreference.setSortMode(DESC_ORDER);
+			} else {
+				StockPreference.setSortMode(ASC_ORDER);
+			}
+			new LoadStockFromDatabase().execute();
 			break;
 		case R.id.ivReload:
 			AllActivity.show(this);
@@ -101,6 +119,60 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		}
 	}
+	
+	@Override
+	public boolean onLongClick(View v) {
+		switch (v.getId()) {
+		case R.id.ivSort:
+			showSortOptions();
+			break;
+		default:
+			break;
+		}
+		return false;
+	}
+
+	private void showSortOptions() {
+		String options[] = { "Code", "Amount", "Volume", "Percent Change" };
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, options);
+		
+		AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+		final AlertDialog dialog = alert.create();
+		alert.setMessage("Sort by...");
+		
+		ListView lv = new ListView(this);
+		lv.setAdapter(adapter);
+		lv.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				String sortBy = null;
+				switch (position) {
+				case 0: // Code
+					sortBy = StockTag.SYMBOL;
+					break;
+				case 1: // Amount
+					sortBy = StockTag.AMOUNT;
+					break;
+				case 2: // Volume
+					sortBy = StockTag.VOLUME;
+					break;
+				case 3: // Percent Change
+					sortBy = StockTag.PERCENT_CHANGE;
+					break;
+				default:
+					break;
+				}
+				StockPreference.setSortBy(sortBy);
+				new LoadStockFromDatabase().execute();
+				dialog.cancel();
+			}
+		});
+		
+		dialog.setView(lv);
+		dialog.show();
+	}
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -142,8 +214,8 @@ public class MainActivity extends Activity implements OnClickListener {
 				String code = input.getText().toString().toUpperCase();
 				StockPreference.saveActivityMode(Util.SEARCH);
 				if (StockPreference.loadDatabaseUpdateStatus()) {
-				new LoadStockFromDatabase(code).execute();
-			}
+					new LoadStockFromDatabase(code).execute();
+				}
 			}
 		});
 
@@ -199,17 +271,17 @@ public class MainActivity extends Activity implements OnClickListener {
 					JSONObject stock = stockArr.getJSONObject(i);
 					mName = stock.getString(StockTag.NAME);
 					mCode = stock.getString(StockTag.SYMBOL);
-					mPercentChange = stock.getString(StockTag.PERCENT_CHANGE);
-					mVolume = stock.getString(StockTag.VOLUME);
+					mPercentChange = stock.getDouble(StockTag.PERCENT_CHANGE);
+					mVolume = stock.getInt(StockTag.VOLUME);
 
 					JSONObject price = stock.getJSONObject(StockTag.PRICE);
 					mCurrency = price.getString(StockTag.CURRENCY);
-					mAmount = price.getString(StockTag.AMOUNT);
+					mAmount = price.getDouble(StockTag.AMOUNT);
 
 					Stock stockRow = new Stock(mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate);
 					
 					//Save to database
-					if (mName != null && mCode != null && mPercentChange != null && mVolume != null && mCurrency != null && mAmount != null && mDate != null) {
+					if (mName != null && mCode != null && mPercentChange != Double.NaN && mVolume != null && mCurrency != null && mAmount != Double.NaN && mDate != null) {
 						datasource.open();
 						datasource.updateStock(stockRow, mCode);
 						datasource.close();
@@ -240,19 +312,21 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		ProgressDialog mDialog;
 		String mMode;
+		String mSortBy, mSortMode;
 		String mInputCode;
 		
-		public LoadStockFromDatabase() {
-			this.mMode = StockPreference.loadActivityMode();
-		}
+		public LoadStockFromDatabase() {}
 		
 		public LoadStockFromDatabase(String code) {
-			this.mMode = StockPreference.loadActivityMode();
 			this.mInputCode = code;
 		}
 		
 		@Override
 		protected void onPreExecute() {
+			this.mMode = StockPreference.loadActivityMode();
+			this.mSortBy = StockPreference.getSortBy();
+			this.mSortMode = StockPreference.getSortMode();
+			
 			if (mMode.equals(Util.SEARCH)) {
 				mDialog = ProgressDialog.show(MainActivity.this, "", "Searching...");
 			}
@@ -260,21 +334,20 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		@Override
 		protected ArrayList<Stock> doInBackground(String... params) {
-			
 			StockDataSource datasource = new StockDataSource(MainActivity.this);
 			ArrayList<Stock> result = null;
 
 			datasource.open();
 				if (mMode.equals(Util.GAINER)) {
-					result = datasource.getGainers();
+					result = datasource.getGainers(mSortBy, mSortMode);
 				} else if (mMode.equals(Util.LOSER)) {
-					result = datasource.getLosers();
+					result = datasource.getLosers(mSortBy, mSortMode);
 				} else if (mMode.equals(Util.SEARCH)){
 					result = datasource.getByCode(mInputCode);
 				} else if (mMode.equals(Util.WATCHLIST)) {
-					result = datasource.getWatchList();
+					result = datasource.getWatchList(mSortBy, mSortMode);
 				} else {
-					result = datasource.getAll();
+					result = datasource.getAll(mSortBy, mSortMode);
 				} 
 				mDate = datasource.getDate();
 			datasource.close();
@@ -302,8 +375,8 @@ public class MainActivity extends Activity implements OnClickListener {
 				}
 
 			});
+
 			listview.setAdapter(adapter);
-			
 			listview.setOnScrollListener(new OnScrollListener() {
 				
 				@Override

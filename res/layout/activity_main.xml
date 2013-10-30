@@ -31,6 +31,15 @@
             android:textStyle="bold" />
 
         <ImageView
+            android:id="@+id/ivSort"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_centerVertical="true"
+            android:layout_margin="5dp"
+            android:layout_toLeftOf="@+id/ivSearch"
+            android:src="@drawable/img_sort" />
+
+        <ImageView
             android:id="@+id/ivSearch"
             android:layout_width="wrap_content"
             android:layout_height="25dp"
@@ -46,7 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="50dp"
         android:background="@color/redfox"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -74,7 +83,7 @@
     <LinearLayout
         android:id="@+id/llFooter"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:background="@color/gunmetal"
         android:gravity="center"

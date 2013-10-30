@@ -1,6 +1,7 @@
 package com.p130001.pseviewer.activity;
 
 import com.p130001.pseviewer.StockPreference;
+import com.p130001.pseviewer.StockTag;
 import com.p130001.pseviewer.Util;
 
 import android.content.Context;
@@ -18,7 +19,11 @@ public class AllActivity extends MainActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		StockPreference.saveActivityMode(Util.ALL);
+		StockPreference.setSortBy(StockTag.SYMBOL);
+		StockPreference.setSortMode("asc");
+		
 		if (isNetworkConnected()) {
 			new GetApiData().execute();
 		} else {

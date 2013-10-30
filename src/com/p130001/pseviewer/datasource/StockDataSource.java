@@ -69,20 +69,21 @@ public class StockDataSource {
 		stock.setId(cursor.getLong(0));
 		stock.setName(cursor.getString(1));
 		stock.setCode(cursor.getString(2));
-		stock.setPercentChange(cursor.getString(3));
-		stock.setVolume(cursor.getString(4));
+		stock.setPercentChange(cursor.getDouble(3));
+		stock.setVolume(cursor.getInt(4));
 		stock.setCurrency(cursor.getString(5));
-		stock.setAmount(cursor.getString(6));
+		stock.setAmount(cursor.getDouble(6));
 		stock.setDate(cursor.getString(7));
 		stock.setWatchFlg(cursor.getString(8));
 		
 		return stock;
 	}
 	
-	public ArrayList<Stock> getAll() {
+	public ArrayList<Stock> getAll(String sortBy, String sortMode) {
 		ArrayList<Stock> stocks = new ArrayList<Stock>();
 
-		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , null, null, null, null, null);
+		String orderBy = sortBy + " " + sortMode;
+		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , null, null, null, null, orderBy);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			Stock stock = cursorToStock(cursor);
@@ -94,11 +95,12 @@ public class StockDataSource {
 		return stocks;
 	}
 
-	public ArrayList<Stock> getGainers() {
+	public ArrayList<Stock> getGainers(String sortBy, String sortMode) {
 		ArrayList<Stock> gainers = new ArrayList<Stock>();
 
 		String selectQuery = MySQLiteHelper.COLUMN_PERCENT_CHANGE + "> 0";
-		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , selectQuery , null, null, null, null);
+		String orderBy = sortBy + " " + sortMode;
+		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , selectQuery , null, null, null, orderBy);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			Stock stock = cursorToStock(cursor);
@@ -110,11 +112,12 @@ public class StockDataSource {
 		return gainers;
 	}
 	
-	public ArrayList<Stock> getLosers() {
+	public ArrayList<Stock> getLosers(String sortBy, String sortMode) {
 		ArrayList<Stock> losers = new ArrayList<Stock>();
 
 		String selectQuery = MySQLiteHelper.COLUMN_PERCENT_CHANGE + "< 0";
-		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , selectQuery , null, null, null, null);
+		String orderBy = sortBy + " " + sortMode;
+		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , selectQuery , null, null, null, orderBy);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			Stock stock = cursorToStock(cursor);
@@ -157,11 +160,12 @@ public class StockDataSource {
 		database.update(MySQLiteHelper.TABLE_STOCKS, values, whereClause, null);
 	}
 
-	public ArrayList<Stock> getWatchList() {
+	public ArrayList<Stock> getWatchList(String sortBy, String sortMode) {
 		ArrayList<Stock> watchList = new ArrayList<Stock>();
 
 		String selectQuery = MySQLiteHelper.COLUMN_WATCH_FLG + "= 1";
-		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , selectQuery , null, null, null, null);
+		String orderBy = sortBy + " " + sortMode;
+		Cursor cursor = database.query(MySQLiteHelper.TABLE_STOCKS, mColumns , selectQuery , null, null, null, orderBy);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			Stock stock = cursorToStock(cursor);

@@ -1,12 +1,13 @@
 package com.p130001.pseviewer.model;
 
 public class Stock {
-	private String mName, mCode, mPercentChange, mVolume, mCurrency, mAmount,
-			mDate, mWatchFlg;
+	private String mName, mCode, mCurrency, mDate, mWatchFlg;
+	private Integer mVolume;
+	private double mPercentChange, mAmount;
 	private long mId;
 
-	public Stock(String name, String code, String percentChange,
-			String volume, String currency, String amount, String date) {
+	public Stock(String name, String code, double percentChange,
+			int volume, String currency, double amount, String date) {
 		this.mName = name;
 		this.mCode = code;
 		this.mPercentChange = percentChange;
@@ -32,11 +33,11 @@ public class Stock {
 		return this.mCode;
 	}
 
-	public String getPercentChange() {
+	public double getPercentChange() {
 		return this.mPercentChange;
 	}
 
-	public String getVolume() {
+	public int getVolume() {
 		return this.mVolume;
 	}
 
@@ -44,7 +45,7 @@ public class Stock {
 		return this.mCurrency;
 	}
 
-	public String getAmount() {
+	public double getAmount() {
 		return this.mAmount;
 	}
 
@@ -68,11 +69,11 @@ public class Stock {
 		this.mCode = string;
 	}
 
-	public void setPercentChange(String string) {
-		this.mPercentChange = string;
+	public void setPercentChange(double d) {
+		this.mPercentChange = d;
 	}
 
-	public void setVolume(String string) {
+	public void setVolume(int string) {
 		this.mVolume = string;
 	}
 
@@ -80,8 +81,8 @@ public class Stock {
 		this.mCurrency = string;
 	}
 
-	public void setAmount(String string) {
-		this.mAmount = string;
+	public void setAmount(double d) {
+		this.mAmount = d;
 	}
 
 	public void setDate(String string) {

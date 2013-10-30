@@ -1,6 +1,7 @@
 package com.p130001.pseviewer.activity;
 
 import com.p130001.pseviewer.StockPreference;
+import com.p130001.pseviewer.StockTag;
 import com.p130001.pseviewer.Util;
 
 import android.content.Context;
@@ -18,6 +19,10 @@ public class WatchListActivity extends MainActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		
+		StockPreference.setSortBy(StockTag.SYMBOL);
+		StockPreference.setSortMode("asc");
+		
 		if (StockPreference.loadDatabaseUpdateStatus()) {
 			new LoadStockFromDatabase().execute();
 		}

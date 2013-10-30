@@ -28,10 +28,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_ID + " integer primary key autoincrement, " 
 			+ COLUMN_NAME + " text not null, "
 			+ COLUMN_SYMBOL + " text not null, "
-			+ COLUMN_PERCENT_CHANGE + " text not null, "
-			+ COLUMN_VOLUME + " text not null, "
+			+ COLUMN_PERCENT_CHANGE + " double not null, "
+			+ COLUMN_VOLUME + " integer not null, "
 			+ COLUMN_CURRENCY + " text not null, "
-			+ COLUMN_AMOUNT + " text not null, "
+			+ COLUMN_AMOUNT + " double not null, "
 			+ COLUMN_AS_OF + " text not null,"
 			+ COLUMN_WATCH_FLG + " text not null default 0"
 			+ ");";

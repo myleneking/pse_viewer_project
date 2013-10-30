@@ -31,4 +31,23 @@ public class StockPreference {
     public static String loadActivityMode() {
     	return mPrefs.getString("activityMode", Util.ALL);
     }
+    
+    public static void setSortBy(String by) {
+    	mEditor.putString("sortBy", by);
+    	mEditor.commit();
+    }
+    
+    public static String getSortBy() {
+    	return mPrefs.getString("sortBy", StockTag.SYMBOL);
+    }
+    
+    public static void setSortMode(String mode) {
+    	mEditor.putString("sortMode", mode);
+    	mEditor.commit();
+    }
+    
+    public static String getSortMode() {
+    	return mPrefs.getString("sortMode", "asc");
+    }
+    
 }
