@@ -37,7 +37,6 @@ import android.widget.Toast;
 import com.p130001.pseviewer.JSONParser;
 import com.p130001.pseviewer.R;
 import com.p130001.pseviewer.StockPreference;
-import com.p130001.pseviewer.StockTag;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.adapter.StockAdapter;
 import com.p130001.pseviewer.adapter.StockAdapter.OnStockItemClickListener;
@@ -149,16 +148,16 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 				String sortBy = null;
 				switch (position) {
 				case 0: // Code
-					sortBy = StockTag.SYMBOL;
+					sortBy = StockDB.COLUMN_SYMBOL;
 					break;
 				case 1: // Amount
-					sortBy = StockTag.AMOUNT;
+					sortBy = StockDB.COLUMN_AMOUNT;
 					break;
 				case 2: // Volume
-					sortBy = StockTag.VOLUME;
+					sortBy = StockDB.COLUMN_VOLUME;
 					break;
 				case 3: // Percent Change
-					sortBy = StockTag.PERCENT_CHANGE;
+					sortBy = StockDB.COLUMN_PERCENT_CHANGE;
 					break;
 				default:
 					break;
@@ -269,14 +268,14 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 
 				for (int i = 0; i < stockArr.length(); i++) {
 					JSONObject stock = stockArr.getJSONObject(i);
-					mName = stock.getString(StockTag.NAME);
-					mCode = stock.getString(StockTag.SYMBOL);
-					mPercentChange = stock.getDouble(StockTag.PERCENT_CHANGE);
-					mVolume = stock.getInt(StockTag.VOLUME);
+					mName = stock.getString("name");
+					mCode = stock.getString("code");
+					mPercentChange = stock.getDouble("percent_change");
+					mVolume = stock.getInt("volume");
 
-					JSONObject price = stock.getJSONObject(StockTag.PRICE);
-					mCurrency = price.getString(StockTag.CURRENCY);
-					mAmount = price.getDouble(StockTag.AMOUNT);
+					JSONObject price = stock.getJSONObject("price");
+					mCurrency = price.getString("currency");
+					mAmount = price.getDouble("amount");
 
 					Stock stockRow = new Stock(mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate);
 					

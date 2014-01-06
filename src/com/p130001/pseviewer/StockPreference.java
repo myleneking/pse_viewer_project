@@ -1,5 +1,7 @@
 package com.p130001.pseviewer;
 
+import com.p130001.pseviewer.db.StockDB;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -38,7 +40,7 @@ public class StockPreference {
     }
     
     public static String getSortBy() {
-    	return mPrefs.getString("sortBy", StockTag.SYMBOL);
+    	return mPrefs.getString("sortBy", StockDB.COLUMN_SYMBOL);
     }
     
     public static void setSortMode(String mode) {

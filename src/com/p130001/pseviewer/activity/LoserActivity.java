@@ -1,11 +1,12 @@
 package com.p130001.pseviewer.activity;
 
-import com.p130001.pseviewer.StockPreference;
-import com.p130001.pseviewer.StockTag;
-import com.p130001.pseviewer.Util;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.p130001.pseviewer.StockPreference;
+import com.p130001.pseviewer.Util;
+import com.p130001.pseviewer.db.StockDB;
 
 public class LoserActivity extends MainActivity {
 
@@ -20,7 +21,7 @@ public class LoserActivity extends MainActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		StockPreference.setSortBy(StockTag.SYMBOL);
+		StockPreference.setSortBy(StockDB.COLUMN_SYMBOL);
 		StockPreference.setSortMode("asc");
 		
 		if (StockPreference.loadDatabaseUpdateStatus()) {

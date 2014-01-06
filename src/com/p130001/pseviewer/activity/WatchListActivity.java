@@ -1,11 +1,11 @@
 package com.p130001.pseviewer.activity;
 
-import com.p130001.pseviewer.StockPreference;
-import com.p130001.pseviewer.StockTag;
-import com.p130001.pseviewer.Util;
-
 import android.content.Context;
 import android.content.Intent;
+
+import com.p130001.pseviewer.StockPreference;
+import com.p130001.pseviewer.Util;
+import com.p130001.pseviewer.db.StockDB;
 
 public class WatchListActivity extends MainActivity {
 
@@ -20,7 +20,7 @@ public class WatchListActivity extends MainActivity {
 	protected void onResume() {
 		super.onResume();
 		
-		StockPreference.setSortBy(StockTag.SYMBOL);
+		StockPreference.setSortBy(StockDB.COLUMN_SYMBOL);
 		StockPreference.setSortMode("asc");
 		
 		if (StockPreference.loadDatabaseUpdateStatus()) {

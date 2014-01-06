@@ -12,17 +12,17 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class StockDB {
 
-protected static final String TABLE_NAME = "stocks";
+	protected static final String TABLE_NAME = "stocks";
 	
-	private static final String COLUMN_ID = "id";
-	private static final String COLUMN_NAME = "name";
-	private static final String COLUMN_SYMBOL = "symbol";
-	private static final String COLUMN_PERCENT_CHANGE = "percent_change";
-	private static final String COLUMN_VOLUME = "volume";
-	private static final String COLUMN_CURRENCY = "currency";
-	private static final String COLUMN_AMOUNT = "amount";
-	private static final String COLUMN_AS_OF = "as_of";
-	private static final String COLUMN_WATCH_FLG = "watch_flg";
+	public static final String COLUMN_ID = "id";
+	public static final String COLUMN_NAME = "name";
+	public static final String COLUMN_SYMBOL = "symbol";
+	public static final String COLUMN_PERCENT_CHANGE = "percent_change";
+	public static final String COLUMN_VOLUME = "volume";
+	public static final String COLUMN_CURRENCY = "currency";
+	public static final String COLUMN_AMOUNT = "amount";
+	public static final String COLUMN_AS_OF = "as_of";
+	public static final String COLUMN_WATCH_FLG = "watch_flg";
 
 	public static final String CREATE_TABLE = "" 
 			+ "create table " + TABLE_NAME 
