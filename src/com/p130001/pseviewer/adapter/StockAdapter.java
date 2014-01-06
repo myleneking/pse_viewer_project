@@ -6,7 +6,7 @@ import com.p130001.pseviewer.R;
 import com.p130001.pseviewer.StockPreference;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.activity.WatchListActivity;
-import com.p130001.pseviewer.datasource.StockDataSource;
+import com.p130001.pseviewer.db.StockDB;
 import com.p130001.pseviewer.model.Stock;
 
 import android.content.Context;
@@ -119,7 +119,7 @@ public class StockAdapter extends BaseAdapter{
 			
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				StockDataSource datasource = new StockDataSource(mContext);
+				StockDB datasource = new StockDB(mContext);
 				datasource.open();
 				
 				if(isChecked) {

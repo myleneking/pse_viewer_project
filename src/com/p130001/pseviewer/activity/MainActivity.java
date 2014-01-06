@@ -41,7 +41,7 @@ import com.p130001.pseviewer.StockTag;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.adapter.StockAdapter;
 import com.p130001.pseviewer.adapter.StockAdapter.OnStockItemClickListener;
-import com.p130001.pseviewer.datasource.StockDataSource;
+import com.p130001.pseviewer.db.StockDB;
 import com.p130001.pseviewer.model.Stock;
 
 public class MainActivity extends Activity implements OnClickListener, OnLongClickListener {
@@ -254,7 +254,7 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 		
 		@Override
 		protected String doInBackground(String... params) {
-			StockDataSource datasource = new StockDataSource(MainActivity.this);
+			StockDB datasource = new StockDB(MainActivity.this);
 			mJStringNew = JSONParser.getJSONFromUrl(Util.API_PSE_ALL);
 
 			try {
@@ -334,7 +334,7 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 		
 		@Override
 		protected ArrayList<Stock> doInBackground(String... params) {
-			StockDataSource datasource = new StockDataSource(MainActivity.this);
+			StockDB datasource = new StockDB(MainActivity.this);
 			ArrayList<Stock> result = null;
 
 			datasource.open();
