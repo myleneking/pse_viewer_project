@@ -4,13 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.p130001.pseviewer.Util;
-import com.p130001.pseviewer.data.StockPreference;
+import com.p130001.pseviewer.data.PSEPreferences;
 import com.p130001.pseviewer.db.StockDB;
 
 public class WatchListActivity extends MainActivity {
 
 	public static void show(Context context) {
-		StockPreference.saveActivityMode(Util.WATCHLIST);
+		PSEPreferences.setActivityMode(Util.WATCHLIST);
 		Intent i = new Intent(context, WatchListActivity.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 		context.startActivity(i);
@@ -20,10 +20,10 @@ public class WatchListActivity extends MainActivity {
 	protected void onResume() {
 		super.onResume();
 		
-		StockPreference.setSortBy(StockDB.COLUMN_SYMBOL);
-		StockPreference.setSortMode("asc");
+		PSEPreferences.setListSortBy(StockDB.COLUMN_SYMBOL);
+		PSEPreferences.setListSortMode("asc");
 		
-		if (StockPreference.loadDatabaseUpdateStatus()) {
+		if (PSEPreferences.getDBUpdateStatus()) {
 			new LoadStockFromDatabase().execute();
 		}
 	}

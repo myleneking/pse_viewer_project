@@ -5,13 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.p130001.pseviewer.Util;
-import com.p130001.pseviewer.data.StockPreference;
+import com.p130001.pseviewer.data.PSEPreferences;
 import com.p130001.pseviewer.db.StockDB;
 
 public class GainerActivity extends MainActivity {
 
 	public static void show(Context context) {
-		StockPreference.saveActivityMode(Util.GAINER);
+		PSEPreferences.setActivityMode(Util.GAINER);
 		Intent i = new Intent(context, GainerActivity.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 		context.startActivity(i);
@@ -21,10 +21,10 @@ public class GainerActivity extends MainActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		StockPreference.setSortBy(StockDB.COLUMN_SYMBOL);
-		StockPreference.setSortMode("asc");
+		PSEPreferences.setListSortBy(StockDB.COLUMN_SYMBOL);
+		PSEPreferences.setListSortMode("asc");
 		
-		if (StockPreference.loadDatabaseUpdateStatus()) {
+		if (PSEPreferences.getDBUpdateStatus()) {
 			new LoadStockFromDatabase().execute();
 		}
 	}

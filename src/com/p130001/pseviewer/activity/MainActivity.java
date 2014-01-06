@@ -39,7 +39,7 @@ import com.p130001.pseviewer.R;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.adapter.StockAdapter;
 import com.p130001.pseviewer.adapter.StockAdapter.OnStockItemClickListener;
-import com.p130001.pseviewer.data.StockPreference;
+import com.p130001.pseviewer.data.PSEPreferences;
 import com.p130001.pseviewer.db.StockDB;
 import com.p130001.pseviewer.model.Stock;
 
@@ -56,7 +56,7 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_main);
-		StockPreference.setupPrefs(this);
+		PSEPreferences.setupPrefs(this);
 			
 		initialize();
 	}
@@ -94,11 +94,11 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 			showSearchInputDialog();
 			break;
 		case R.id.ivSort:
-			String sortMode = StockPreference.getSortMode();
+			String sortMode = PSEPreferences.getListSortMode();
 			if (sortMode.equals(ASC_ORDER)) {
-				StockPreference.setSortMode(DESC_ORDER);
+				PSEPreferences.setListSortMode(DESC_ORDER);
 			} else {
-				StockPreference.setSortMode(ASC_ORDER);
+				PSEPreferences.setListSortMode(ASC_ORDER);
 			}
 			new LoadStockFromDatabase().execute();
 			break;
@@ -162,7 +162,7 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 				default:
 					break;
 				}
-				StockPreference.setSortBy(sortBy);
+				PSEPreferences.setListSortBy(sortBy);
 				new LoadStockFromDatabase().execute();
 				dialog.cancel();
 			}
@@ -211,8 +211,8 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String code = input.getText().toString().toUpperCase();
-				StockPreference.saveActivityMode(Util.SEARCH);
-				if (StockPreference.loadDatabaseUpdateStatus()) {
+				PSEPreferences.setActivityMode(Util.SEARCH);
+				if (PSEPreferences.getDBUpdateStatus()) {
 					new LoadStockFromDatabase(code).execute();
 				}
 			}
@@ -243,7 +243,7 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 		String mMode;
 		
 		public GetApiData() {
-			this.mMode = StockPreference.loadActivityMode();;
+			this.mMode = PSEPreferences.getActivityMode();;
 		}
 		
 		@Override
@@ -286,8 +286,8 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 						datasource.close();
 					}
 				}
-				if (!StockPreference.loadDatabaseUpdateStatus()) {
-					StockPreference.saveDatabaseUpdateStatus(true);;
+				if (!PSEPreferences.getDBUpdateStatus()) {
+					PSEPreferences.setDBUpdateStatus(true);;
 				}
 				
 			} catch (Exception e) {
@@ -322,9 +322,9 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 		
 		@Override
 		protected void onPreExecute() {
-			this.mMode = StockPreference.loadActivityMode();
-			this.mSortBy = StockPreference.getSortBy();
-			this.mSortMode = StockPreference.getSortMode();
+			this.mMode = PSEPreferences.getActivityMode();
+			this.mSortBy = PSEPreferences.getListSortBy();
+			this.mSortMode = PSEPreferences.getListSortMode();
 			
 			if (mMode.equals(Util.SEARCH)) {
 				mDialog = ProgressDialog.show(MainActivity.this, "", "Searching...");

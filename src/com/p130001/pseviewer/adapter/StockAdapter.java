@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.p130001.pseviewer.R;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.activity.WatchListActivity;
-import com.p130001.pseviewer.data.StockPreference;
+import com.p130001.pseviewer.data.PSEPreferences;
 import com.p130001.pseviewer.db.StockDB;
 import com.p130001.pseviewer.model.Stock;
 
@@ -133,7 +133,7 @@ public class StockAdapter extends BaseAdapter{
 				
 				datasource.close();
 				
-				String mode = StockPreference.loadActivityMode();
+				String mode = PSEPreferences.getActivityMode();
 				if (mode.equals(Util.WATCHLIST)) {
 					WatchListActivity.show(mContext);
 				}

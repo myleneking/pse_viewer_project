@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.p130001.pseviewer.Util;
-import com.p130001.pseviewer.data.StockPreference;
+import com.p130001.pseviewer.data.PSEPreferences;
 import com.p130001.pseviewer.db.StockDB;
 
 public class AllActivity extends MainActivity {
@@ -20,14 +20,14 @@ public class AllActivity extends MainActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		StockPreference.saveActivityMode(Util.ALL);
-		StockPreference.setSortBy(StockDB.COLUMN_SYMBOL);
-		StockPreference.setSortMode("asc");
+		PSEPreferences.setActivityMode(Util.ALL);
+		PSEPreferences.setListSortBy(StockDB.COLUMN_SYMBOL);
+		PSEPreferences.setListSortMode("asc");
 		
 		if (isNetworkConnected()) {
 			new GetApiData().execute();
 		} else {
-			if (StockPreference.loadDatabaseUpdateStatus()) {
+			if (PSEPreferences.getDBUpdateStatus()) {
 				new LoadStockFromDatabase().execute();
 				showAsOfDate();
 			}
