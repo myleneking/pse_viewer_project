@@ -3,9 +3,9 @@ package com.p130001.pseviewer.adapter;
 import java.util.ArrayList;
 
 import com.p130001.pseviewer.R;
-import com.p130001.pseviewer.StockPreference;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.activity.WatchListActivity;
+import com.p130001.pseviewer.data.StockPreference;
 import com.p130001.pseviewer.db.StockDB;
 import com.p130001.pseviewer.model.Stock;
 

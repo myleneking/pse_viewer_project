@@ -36,10 +36,10 @@ import android.widget.Toast;
 
 import com.p130001.pseviewer.JSONParser;
 import com.p130001.pseviewer.R;
-import com.p130001.pseviewer.StockPreference;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.adapter.StockAdapter;
 import com.p130001.pseviewer.adapter.StockAdapter.OnStockItemClickListener;
+import com.p130001.pseviewer.data.StockPreference;
 import com.p130001.pseviewer.db.StockDB;
 import com.p130001.pseviewer.model.Stock;
 

@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.p130001.pseviewer.StockPreference;
 import com.p130001.pseviewer.Util;
+import com.p130001.pseviewer.data.StockPreference;
 import com.p130001.pseviewer.db.StockDB;
 
 public class GainerActivity extends MainActivity {

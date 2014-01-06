@@ -3,8 +3,8 @@ package com.p130001.pseviewer.activity;
 import android.content.Context;
 import android.content.Intent;
 
-import com.p130001.pseviewer.StockPreference;
 import com.p130001.pseviewer.Util;
+import com.p130001.pseviewer.data.StockPreference;
 import com.p130001.pseviewer.db.StockDB;
 
 public class WatchListActivity extends MainActivity {
