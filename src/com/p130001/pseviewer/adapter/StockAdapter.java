@@ -74,13 +74,13 @@ public class StockAdapter extends BaseAdapter{
 		ToggleButton tbWatch = (ToggleButton) rowView.findViewById(R.id.tbWatchList);
 
 		final Stock item = this.mItems.get(position);
-		double percentChange = item.getPercentChange();
+		String percentChange = item.getPercentChange();
 		int color, arrow;
 		
-		if (percentChange < 0) {
+		if (Double.parseDouble(percentChange) < 0) {
 			color = R.color.red;
 			arrow = R.drawable.img_arrow_down_colored;
-		} else if (percentChange > 0) {
+		} else if (Double.parseDouble(percentChange) > 0) {
 			color = R.color.green;
 			arrow = R.drawable.img_arrow_up_colored;
 		} else {
@@ -109,7 +109,7 @@ public class StockAdapter extends BaseAdapter{
 		tvCurrency.setText(item.getCurrency());
 		tvCurrency.setTextColor(mContext.getResources().getColor(color));
 		
-		tvAmount.setText(String.format("%.2f", item.getAmount()));
+		tvAmount.setText(String.format("%.2f", Float.parseFloat(item.getAmount())));
 		tvAmount.setTextColor(mContext.getResources().getColor(color));
 		
 		ivArrow.setImageResource(arrow);

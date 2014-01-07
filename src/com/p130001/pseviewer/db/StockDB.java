@@ -30,10 +30,10 @@ public class StockDB {
 			+ COLUMN_ID + " integer primary key autoincrement, " 
 			+ COLUMN_NAME + " text not null, "
 			+ COLUMN_SYMBOL + " text not null, "
-			+ COLUMN_PERCENT_CHANGE + " double not null, "
-			+ COLUMN_VOLUME + " integer not null, "
+			+ COLUMN_PERCENT_CHANGE + " text not null, "
+			+ COLUMN_VOLUME + " text not null, "
 			+ COLUMN_CURRENCY + " text not null, "
-			+ COLUMN_AMOUNT + " double not null, "
+			+ COLUMN_AMOUNT + " text not null, "
 			+ COLUMN_AS_OF + " text not null,"
 			+ COLUMN_WATCH_FLG + " text not null default 0"
 			+ ");";
@@ -89,10 +89,10 @@ public class StockDB {
 		stock.setId(cursor.getLong(0));
 		stock.setName(cursor.getString(1));
 		stock.setCode(cursor.getString(2));
-		stock.setPercentChange(cursor.getDouble(3));
-		stock.setVolume(cursor.getInt(4));
+		stock.setPercentChange(cursor.getString(3));
+		stock.setVolume(cursor.getString(4));
 		stock.setCurrency(cursor.getString(5));
-		stock.setAmount(cursor.getDouble(6));
+		stock.setAmount(cursor.getString(6));
 		stock.setDate(cursor.getString(7));
 		stock.setWatchFlg(cursor.getString(8));
 		
@@ -102,7 +102,7 @@ public class StockDB {
 	public ArrayList<Stock> getAll(String sortBy, String sortMode) {
 		ArrayList<Stock> stocks = new ArrayList<Stock>();
 
-		String orderBy = sortBy + " " + sortMode;
+		String orderBy = sortBy + "*1 " + sortMode;
 		Cursor cursor = mDatabase.query(TABLE_NAME, mColumns , null, null, null, null, orderBy);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {

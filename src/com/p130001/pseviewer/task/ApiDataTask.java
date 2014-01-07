@@ -60,12 +60,12 @@ public class ApiDataTask extends AsyncTask<String, Integer, String> {
 				
 				String name = stock.getString("name");
 				String code = stock.getString("symbol");
-				double percentChange = stock.getDouble("percent_change");
-				int volume = stock.getInt("volume");
+				String percentChange = stock.getString("percent_change");
+				String volume = stock.getString("volume");
 
 				JSONObject price = stock.getJSONObject("price");
 				String currency = price.getString("currency");
-				double amount = price.getDouble("amount");
+				String amount = price.getString("amount");
 				
 				Stock stockRow = new Stock(name, code, percentChange,
 						volume, currency, amount, date);

@@ -2,12 +2,12 @@ package com.p130001.pseviewer.model;
 
 public class Stock {
 	private String mName, mCode, mCurrency, mDate, mWatchFlg;
-	private Integer mVolume;
-	private double mPercentChange, mAmount;
+	private String mVolume;
+	private String mPercentChange, mAmount;
 	private long mId;
 
-	public Stock(String name, String code, double percentChange,
-			int volume, String currency, double amount, String date) {
+	public Stock(String name, String code, String percentChange,
+			String volume, String currency, String amount, String date) {
 		this.mName = name;
 		this.mCode = code;
 		this.mPercentChange = percentChange;
@@ -33,11 +33,11 @@ public class Stock {
 		return this.mCode;
 	}
 
-	public double getPercentChange() {
+	public String getPercentChange() {
 		return this.mPercentChange;
 	}
 
-	public int getVolume() {
+	public String getVolume() {
 		return this.mVolume;
 	}
 
@@ -45,7 +45,7 @@ public class Stock {
 		return this.mCurrency;
 	}
 
-	public double getAmount() {
+	public String getAmount() {
 		return this.mAmount;
 	}
 
@@ -69,11 +69,11 @@ public class Stock {
 		this.mCode = string;
 	}
 
-	public void setPercentChange(double d) {
+	public void setPercentChange(String d) {
 		this.mPercentChange = d;
 	}
 
-	public void setVolume(int string) {
+	public void setVolume(String string) {
 		this.mVolume = string;
 	}
 
@@ -81,7 +81,7 @@ public class Stock {
 		this.mCurrency = string;
 	}
 
-	public void setAmount(double d) {
+	public void setAmount(String d) {
 		this.mAmount = d;
 	}
 
