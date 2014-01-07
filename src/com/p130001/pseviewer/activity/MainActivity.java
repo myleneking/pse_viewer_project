@@ -1,18 +1,11 @@
 package com.p130001.pseviewer.activity;
 
-import java.util.ArrayList;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -21,8 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.animation.AnimationUtils;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -30,18 +21,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.p130001.pseviewer.JSONParser;
 import com.p130001.pseviewer.R;
 import com.p130001.pseviewer.Util;
-import com.p130001.pseviewer.adapter.StockAdapter;
-import com.p130001.pseviewer.adapter.StockAdapter.OnStockItemClickListener;
 import com.p130001.pseviewer.data.PSEPreferences;
 import com.p130001.pseviewer.db.StockDB;
-import com.p130001.pseviewer.model.Stock;
+import com.p130001.pseviewer.task.LoadStockFromDatabaseTask;
 
 public class MainActivity extends Activity implements OnClickListener, OnLongClickListener {
 
@@ -100,7 +86,7 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 			} else {
 				PSEPreferences.setListSortMode(ASC_ORDER);
 			}
-			new LoadStockFromDatabase().execute();
+			new LoadStockFromDatabaseTask(MainActivity.this).execute();
 			break;
 		case R.id.ivReload:
 			AllActivity.show(this);
@@ -163,7 +149,7 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 					break;
 				}
 				PSEPreferences.setListSortBy(sortBy);
-				new LoadStockFromDatabase().execute();
+				new LoadStockFromDatabaseTask(MainActivity.this).execute();
 				dialog.cancel();
 			}
 		});
@@ -213,7 +199,7 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 				String code = input.getText().toString().toUpperCase();
 				PSEPreferences.setActivityMode(Util.SEARCH);
 				if (PSEPreferences.getDBUpdateStatus()) {
-					new LoadStockFromDatabase(code).execute();
+					new LoadStockFromDatabaseTask(MainActivity.this, code).execute();
 				}
 			}
 		});
@@ -237,209 +223,4 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 		}, 3000);
 	}
 	
-	public class GetApiData extends AsyncTask<String, Integer, String> {
-
-		ProgressDialog mDialog;
-		String mMode;
-		
-		public GetApiData() {
-			this.mMode = PSEPreferences.getActivityMode();;
-		}
-		
-		@Override
-		protected void onPreExecute() {
-			mDialog = ProgressDialog.show(MainActivity.this, "", "Loading...");
-		}
-		
-		@Override
-		protected String doInBackground(String... params) {
-			StockDB datasource = new StockDB(MainActivity.this);
-			mJStringNew = JSONParser.getJSONFromUrl(Util.API_PSE_ALL);
-
-			try {
-				JSONObject jObject = new JSONObject(mJStringNew);
-
-				String asOf = jObject.getString("as_of");
-				String date = asOf.substring(0, 10);
-				String time = asOf.substring(11, 19);
-				mDate = date + " " + time;
-
-				JSONArray stockArr = jObject.getJSONArray("stock");
-
-				for (int i = 0; i < stockArr.length(); i++) {
-					JSONObject stock = stockArr.getJSONObject(i);
-					mName = stock.getString("name");
-					mCode = stock.getString("code");
-					mPercentChange = stock.getDouble("percent_change");
-					mVolume = stock.getInt("volume");
-
-					JSONObject price = stock.getJSONObject("price");
-					mCurrency = price.getString("currency");
-					mAmount = price.getDouble("amount");
-
-					Stock stockRow = new Stock(mName, mCode, mPercentChange, mVolume, mCurrency, mAmount, mDate);
-					
-					//Save to database
-					if (mName != null && mCode != null && mPercentChange != Double.NaN && mVolume != null && mCurrency != null && mAmount != Double.NaN && mDate != null) {
-						datasource.open();
-						datasource.updateStock(stockRow, mCode);
-						datasource.close();
-					}
-				}
-				if (!PSEPreferences.getDBUpdateStatus()) {
-					PSEPreferences.setDBUpdateStatus(true);;
-				}
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return null;
-		}
-		
-		@Override
-		protected void onProgressUpdate(Integer... values) {
-		}
-		
-		@Override
-		protected void onPostExecute(String result) {
-			mDialog.dismiss();
-			new LoadStockFromDatabase().execute();
-		}
-	}
-	
-	public class LoadStockFromDatabase extends AsyncTask<String, Integer, ArrayList<Stock>> {
-
-		ProgressDialog mDialog;
-		String mMode;
-		String mSortBy, mSortMode;
-		String mInputCode;
-		
-		public LoadStockFromDatabase() {}
-		
-		public LoadStockFromDatabase(String code) {
-			this.mInputCode = code;
-		}
-		
-		@Override
-		protected void onPreExecute() {
-			this.mMode = PSEPreferences.getActivityMode();
-			this.mSortBy = PSEPreferences.getListSortBy();
-			this.mSortMode = PSEPreferences.getListSortMode();
-			
-			if (mMode.equals(Util.SEARCH)) {
-				mDialog = ProgressDialog.show(MainActivity.this, "", "Searching...");
-			}
-		};
-		
-		@Override
-		protected ArrayList<Stock> doInBackground(String... params) {
-			StockDB datasource = new StockDB(MainActivity.this);
-			ArrayList<Stock> result = null;
-
-			datasource.open();
-				if (mMode.equals(Util.GAINER)) {
-					result = datasource.getGainers(mSortBy, mSortMode);
-				} else if (mMode.equals(Util.LOSER)) {
-					result = datasource.getLosers(mSortBy, mSortMode);
-				} else if (mMode.equals(Util.SEARCH)){
-					result = datasource.getByCode(mInputCode);
-				} else if (mMode.equals(Util.WATCHLIST)) {
-					result = datasource.getWatchList(mSortBy, mSortMode);
-				} else {
-					result = datasource.getAll(mSortBy, mSortMode);
-				} 
-				mDate = datasource.getDate();
-			datasource.close();
-			
-			return result;
-		}
-		
-		@Override
-		protected void onPostExecute(ArrayList<Stock> result) {
-			if (result.size() == 0 && mMode.equals(Util.SEARCH)) {
-				Toast.makeText(MainActivity.this, "Code not found!", Toast.LENGTH_SHORT).show();
-			}
-			
-			TextView mAsOfTextView = (TextView) findViewById(R.id.tvAsOf);
-			mAsOfTextView.setText(mDate);
-			
-			final ListView listview = (ListView) findViewById(R.id.listView);
-			StockAdapter adapter = new StockAdapter(MainActivity.this, result);
-			adapter.setOnStockItemClickListener(new OnStockItemClickListener() {
-
-				@Override
-				public void onStockItemClick(Stock item) {
-					showOptionDialog(item);
-					//Toast.makeText(MainActivity.this, "item selected " + item.getName(), Toast.LENGTH_SHORT).show();
-				}
-
-			});
-
-			listview.setAdapter(adapter);
-			listview.setOnScrollListener(new OnScrollListener() {
-				
-				@Override
-				public void onScrollStateChanged(AbsListView view, int scrollState) {
-					RelativeLayout header = (RelativeLayout) findViewById(R.id.rlHeader);
-					LinearLayout footer = (LinearLayout) findViewById(R.id.llFooter);
-					switch (scrollState) {
-					case OnScrollListener.SCROLL_STATE_IDLE:
-						header.setVisibility(View.VISIBLE);
-						header.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_up_in));
-						footer.setVisibility(View.VISIBLE);
-						footer.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_down_in));
-						break;
-					case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
-						header.setVisibility(View.INVISIBLE);
-						header.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_down_out));
-						footer.setVisibility(View.INVISIBLE);
-						footer.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_up_out));
-						break;
-					default:
-						break;
-					}
-				}
-				
-				@Override
-				public void onScroll(AbsListView view, int firstVisibleItem,
-						int visibleItemCount, int totalItemCount) {}
-			});
-			
-			if (mMode.equals(Util.SEARCH)) {
-				mDialog.dismiss();
-			}
-		}
-
-		private void showOptionDialog(final Stock item) {
-			String options[] = { "Open Trends", "Remind Me" };
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, options);
-			
-			AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-			final AlertDialog dialog = alert.create();
-			
-			ListView lv = new ListView(MainActivity.this);
-			lv.setAdapter(adapter);
-			lv.setOnItemClickListener(new OnItemClickListener() {
-
-				@Override
-				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					switch (position) {
-					case 0: // Open Trends
-						GraphActivity.show(MainActivity.this, item.getCode());
-						break;
-					case 1: // Remind Me
-						break;
-					default:
-						break;
-					}
-					dialog.cancel();
-				}
-			});
-			
-			dialog.setView(lv);
-			dialog.show();
-		}
-		
-	}
-
-	}
+}

@@ -7,6 +7,8 @@ import android.os.Bundle;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.data.PSEPreferences;
 import com.p130001.pseviewer.db.StockDB;
+import com.p130001.pseviewer.task.ApiDataTask;
+import com.p130001.pseviewer.task.LoadStockFromDatabaseTask;
 
 public class AllActivity extends MainActivity {
 
@@ -25,10 +27,10 @@ public class AllActivity extends MainActivity {
 		PSEPreferences.setListSortMode("asc");
 		
 		if (isNetworkConnected()) {
-			new GetApiData().execute();
+			new ApiDataTask(AllActivity.this).execute();
 		} else {
 			if (PSEPreferences.getDBUpdateStatus()) {
-				new LoadStockFromDatabase().execute();
+				new LoadStockFromDatabaseTask(AllActivity.this).execute();
 				showAsOfDate();
 			}
 		}

@@ -2,17 +2,17 @@ package com.p130001.pseviewer.db;
 
 import java.util.ArrayList;
 
-import com.p130001.pseviewer.model.Stock;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.p130001.pseviewer.model.Stock;
+
 public class StockDB {
 
-	protected static final String TABLE_NAME = "stocks";
+	public static final String TABLE_NAME = "stocks";
 	
 	public static final String COLUMN_ID = "id";
 	public static final String COLUMN_NAME = "name";
@@ -38,9 +38,8 @@ public class StockDB {
 			+ COLUMN_WATCH_FLG + " text not null default 0"
 			+ ");";
 	
-	private SQLiteDatabase database;
-	private PSEDatabase dbHelper;
-	private Context mContext;
+	private SQLiteDatabase mDatabase;
+	private PSEDatabase mDBHelper;
 	private String[] mColumns = {
 			COLUMN_ID,
 			COLUMN_NAME,
@@ -54,20 +53,15 @@ public class StockDB {
 	};
 	
 	public StockDB (Context context) {
-		dbHelper = new PSEDatabase(context);
-		mContext = context;
+		mDBHelper = new PSEDatabase(context);
 	}
 
 	public void open() throws SQLException {
-		database = dbHelper.getWritableDatabase();
+		mDatabase = mDBHelper.getWritableDatabase();
 	}
 
 	public void close() {
-		dbHelper.close();
-	}
-	
-	public void dropDatabase() {
-		mContext.deleteDatabase(PSEDatabase.DATABASE_NAME);
+		mDBHelper.close();
 	}
 	
 	public void updateStock(Stock stock, String code) {
@@ -84,9 +78,9 @@ public class StockDB {
 		ArrayList<Stock> result = this.getByCode(code);
 		if (result.size() != 0) {
 			String whereClause = COLUMN_SYMBOL + "='" + code + "'";
-			database.update(TABLE_NAME, values, whereClause, null);
+			mDatabase.update(TABLE_NAME, values, whereClause, null);
 		} else {
-			database.insert(TABLE_NAME, null, values);
+			mDatabase.insert(TABLE_NAME, null, values);
 		}
 	}
 	
@@ -109,7 +103,7 @@ public class StockDB {
 		ArrayList<Stock> stocks = new ArrayList<Stock>();
 
 		String orderBy = sortBy + " " + sortMode;
-		Cursor cursor = database.query(TABLE_NAME, mColumns , null, null, null, null, orderBy);
+		Cursor cursor = mDatabase.query(TABLE_NAME, mColumns , null, null, null, null, orderBy);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			Stock stock = cursorToStock(cursor);
@@ -126,7 +120,7 @@ public class StockDB {
 
 		String selectQuery = COLUMN_PERCENT_CHANGE + "> 0";
 		String orderBy = sortBy + " " + sortMode;
-		Cursor cursor = database.query(TABLE_NAME, mColumns , selectQuery , null, null, null, orderBy);
+		Cursor cursor = mDatabase.query(TABLE_NAME, mColumns , selectQuery , null, null, null, orderBy);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			Stock stock = cursorToStock(cursor);
@@ -143,7 +137,7 @@ public class StockDB {
 
 		String selectQuery = COLUMN_PERCENT_CHANGE + "< 0";
 		String orderBy = sortBy + " " + sortMode;
-		Cursor cursor = database.query(TABLE_NAME, mColumns , selectQuery , null, null, null, orderBy);
+		Cursor cursor = mDatabase.query(TABLE_NAME, mColumns , selectQuery , null, null, null, orderBy);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			Stock stock = cursorToStock(cursor);
@@ -158,7 +152,7 @@ public class StockDB {
 	public ArrayList<Stock> getByCode(String code) {
 		ArrayList<Stock> search = new ArrayList<Stock>();
 		String selectQuery = COLUMN_SYMBOL + "= '" + code + "'";
-		Cursor cursor = database.query(TABLE_NAME, mColumns , selectQuery , null, null, null, null);
+		Cursor cursor = mDatabase.query(TABLE_NAME, mColumns , selectQuery , null, null, null, null);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			Stock stock = cursorToStock(cursor);
@@ -175,7 +169,7 @@ public class StockDB {
 		values.put(COLUMN_WATCH_FLG, "1");
 		
 		String whereClause = COLUMN_SYMBOL + "='" + code + "'"; 
-		database.update(TABLE_NAME, values, whereClause, null);
+		mDatabase.update(TABLE_NAME, values, whereClause, null);
 	}
 
 	public void removeToWatchList(String code) {
@@ -183,7 +177,7 @@ public class StockDB {
 		values.put(COLUMN_WATCH_FLG, "0");
 		
 		String whereClause = COLUMN_SYMBOL + "='" + code + "'"; 
-		database.update(TABLE_NAME, values, whereClause, null);
+		mDatabase.update(TABLE_NAME, values, whereClause, null);
 	}
 
 	public ArrayList<Stock> getWatchList(String sortBy, String sortMode) {
@@ -191,7 +185,7 @@ public class StockDB {
 
 		String selectQuery = COLUMN_WATCH_FLG + "= 1";
 		String orderBy = sortBy + " " + sortMode;
-		Cursor cursor = database.query(TABLE_NAME, mColumns , selectQuery , null, null, null, orderBy);
+		Cursor cursor = mDatabase.query(TABLE_NAME, mColumns , selectQuery , null, null, null, orderBy);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			Stock stock = cursorToStock(cursor);
@@ -204,11 +198,11 @@ public class StockDB {
 	}
 
 	public String getDate() {
-		String selectQuery = COLUMN_ID + "= 1";
-		Cursor cursor = database.query(TABLE_NAME, new String[] { COLUMN_AS_OF } , selectQuery , null, null, null, null);
+		Cursor cursor = mDatabase.query(TABLE_NAME, mColumns, null, null, null, null, null, "1");
 		cursor.moveToFirst();
-		String date = cursor.getString(0);
+		String date = cursor.getString(7);
 		cursor.close();
+		
 		return date;
 	}
 

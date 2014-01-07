@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.data.PSEPreferences;
 import com.p130001.pseviewer.db.StockDB;
+import com.p130001.pseviewer.task.LoadStockFromDatabaseTask;
 
 public class GainerActivity extends MainActivity {
 
@@ -25,7 +26,7 @@ public class GainerActivity extends MainActivity {
 		PSEPreferences.setListSortMode("asc");
 		
 		if (PSEPreferences.getDBUpdateStatus()) {
-			new LoadStockFromDatabase().execute();
+			new LoadStockFromDatabaseTask(GainerActivity.this).execute();
 		}
 	}
 

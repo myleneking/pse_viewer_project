@@ -6,6 +6,7 @@ import android.content.Intent;
 import com.p130001.pseviewer.Util;
 import com.p130001.pseviewer.data.PSEPreferences;
 import com.p130001.pseviewer.db.StockDB;
+import com.p130001.pseviewer.task.LoadStockFromDatabaseTask;
 
 public class WatchListActivity extends MainActivity {
 
@@ -24,7 +25,7 @@ public class WatchListActivity extends MainActivity {
 		PSEPreferences.setListSortMode("asc");
 		
 		if (PSEPreferences.getDBUpdateStatus()) {
-			new LoadStockFromDatabase().execute();
+			new LoadStockFromDatabaseTask(WatchListActivity.this).execute();
 		}
 	}
 	
