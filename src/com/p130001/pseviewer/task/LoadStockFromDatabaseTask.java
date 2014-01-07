@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
@@ -75,7 +76,6 @@ public class LoadStockFromDatabaseTask extends AsyncTask<String, Integer, ArrayL
 			} else {
 				result = datasource.getAll(mSortBy, mSortMode);
 			}
-//			String tempDate = datasource.getDate();
 			mDate = datasource.getDate();
 		datasource.close();
 		
@@ -135,6 +135,8 @@ public class LoadStockFromDatabaseTask extends AsyncTask<String, Integer, ArrayL
 		
 		if (mMode.equals(Util.SEARCH)) {
 			mDialog.dismiss();
+		} else if (mMode.equals(Util.ALL)) {
+			showAsOfDate();
 		}
 	}
 
@@ -168,4 +170,18 @@ public class LoadStockFromDatabaseTask extends AsyncTask<String, Integer, ArrayL
 		dialog.show();
 	}
 	
+	protected void showAsOfDate() {
+		final LinearLayout asOfLayout = (LinearLayout) ((Activity) mContext).findViewById(R.id.llAsOf);
+		asOfLayout.setVisibility(View.VISIBLE);
+		asOfLayout.setAnimation(AnimationUtils.loadAnimation(mContext, R.anim.slide_left_in));
+		
+		new Handler().postDelayed(new Runnable() {
+			
+			@Override
+			public void run() {
+				asOfLayout.setVisibility(View.INVISIBLE);
+				asOfLayout.setAnimation(AnimationUtils.loadAnimation(mContext, R.anim.slide_right_out));
+			}
+		}, 3000);
+	}
 }

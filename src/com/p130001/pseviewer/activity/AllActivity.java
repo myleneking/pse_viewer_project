@@ -31,7 +31,6 @@ public class AllActivity extends MainActivity {
 		} else {
 			if (PSEPreferences.getDBUpdateStatus()) {
 				new LoadStockFromDatabaseTask(AllActivity.this).execute();
-				showAsOfDate();
 			}
 		}
 	}

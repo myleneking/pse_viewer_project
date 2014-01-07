@@ -7,19 +7,16 @@ import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -208,19 +205,4 @@ public class MainActivity extends Activity implements OnClickListener, OnLongCli
 		alert.show();
 	}
 
-	protected void showAsOfDate() {
-		final LinearLayout asOfLayout = (LinearLayout) findViewById(R.id.llAsOf);
-		asOfLayout.setVisibility(View.VISIBLE);
-		asOfLayout.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_left_in));
-		
-		new Handler().postDelayed(new Runnable() {
-			
-			@Override
-			public void run() {
-				asOfLayout.setVisibility(View.INVISIBLE);
-				asOfLayout.setAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.slide_right_out));
-			}
-		}, 3000);
-	}
-	
 }
