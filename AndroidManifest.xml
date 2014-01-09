@@ -27,11 +27,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.p130001.pseviewer.activity.AllActivity" />
-        <activity android:name="com.p130001.pseviewer.activity.GainerActivity" />
-        <activity android:name="com.p130001.pseviewer.activity.LoserActivity" />
-        <activity android:name="com.p130001.pseviewer.activity.WatchListActivity" />
-        <activity android:name="com.p130001.pseviewer.activity.GraphActivity" />
+        <activity
+            android:name="com.p130001.pseviewer.activity.AllActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.p130001.pseviewer.activity.GainerActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.p130001.pseviewer.activity.LoserActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.p130001.pseviewer.activity.WatchListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.p130001.pseviewer.activity.GraphActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
