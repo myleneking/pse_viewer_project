@@ -101,8 +101,14 @@ public class StockDB {
 	
 	public ArrayList<Stock> getAll(String sortBy, String sortMode) {
 		ArrayList<Stock> stocks = new ArrayList<Stock>();
-
-		String orderBy = sortBy + "*1 " + sortMode;
+		String orderBy;
+		
+		if (sortBy.equals(StockDB.COLUMN_SYMBOL)) {
+			orderBy = sortBy + " " + sortMode;
+		} else {
+			orderBy = sortBy + "*1 " + sortMode;
+		}
+		
 		Cursor cursor = mDatabase.query(TABLE_NAME, mColumns , null, null, null, null, orderBy);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
