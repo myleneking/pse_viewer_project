@@ -76,7 +76,9 @@ public class LoadStockFromDatabaseTask extends AsyncTask<String, Integer, ArrayL
 			} else {
 				result = datasource.getAll(mSortBy, mSortMode);
 			}
-			mDate = datasource.getDate();
+
+			mDate = PSEPreferences.getLastUpdateDate();
+			
 		datasource.close();
 		
 		return result;

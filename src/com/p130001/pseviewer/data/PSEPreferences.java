@@ -14,6 +14,7 @@ public class PSEPreferences {
 	private static final String ACTIVITY_MODE_KEY = "activity_mode";
 	private static final String LIST_SORT_BY_KEY = "list_sort_by";
 	private static final String LIST_SORT_MODE_KEY = "list_sort_mode";
+	private static final String LAST_UPDATE_DATE = "last_update_date";
 	
 	private static Editor mEditor;
 	private static SharedPreferences mPrefs;
@@ -59,4 +60,12 @@ public class PSEPreferences {
     	return mPrefs.getString(LIST_SORT_MODE_KEY, "asc");
     }
     
+    public static void setLastUpdateDate(String date) {
+    	mEditor.putString(LAST_UPDATE_DATE, date);
+    	mEditor.commit();
+    }
+    
+    public static String getLastUpdateDate() {
+    	return mPrefs.getString(LAST_UPDATE_DATE, "");
+    }
 }

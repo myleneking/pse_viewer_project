@@ -50,6 +50,8 @@ public class ApiDataTask extends AsyncTask<String, Integer, String> {
 				PSEPreferences.setDBUpdateStatus(true);
 			}
 			
+			PSEPreferences.setLastUpdateDate(date);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
